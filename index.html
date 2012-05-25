@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+ 
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <title>Hubiquitus administration</title>
+        <link rel="stylesheet" href="public/css/master.css" />
+        <script type="text/javascript" charset="utf-8" src="libs/jquery-1.7.1.min.js"></script>
+        <script type="text/javascript" charset="utf-8" src="libs/underscore-min.js"></script>
+        <script type="text/javascript" charset="utf-8" src="libs/backbone.js"></script>
+        <script type="text/javascript" charset="utf-8" src="libs/hubiquitusjs/lib/transports/socketio/socket.io.js"></script>
+        <script data-main="libs/hubiquitusjs/hubiquitus.js" src='libs/hubiquitusjs/lib/require.js'></script>
+        
+        <script type="text/javascript" charset="utf-8" src="js/app.models.js"></script>
+        <script type="text/javascript" charset="utf-8" src="js/connection.js"></script>
+        <script type="text/javascript" charset="utf-8" src="js/app.views.js"></script>
+        <script type="text/javascript" charset="utf-8" src="js/app.js"></script>
+    </head>
+
+    <body>
+        <div id="channels">
+            <header>
+                <h1>Channel administration</h1>
+                <span id="status"></span>
+                
+            </header>
+            <div id="channel_content"></div>
+        </div>
+    </body>
+
+    <script type="text/template" id="template-channelListPage">
+        <section id="list">
+            <h2>List of channels</h2>
+            <table id="listChannels">
+                <th>Id</th>
+                <th>Host</th>
+                <th>Owner</th>
+                <th>Description</th>
+                <th>Active</th>
+                <% for ( var i = 0 ; i < (current.length) ; i++ ) { %>
+                    <tr id="channel" class="row">
+                        <td><%= current[i].attributes.chid %></td>
+                        <td><%= current[i].attributes.host %></td>
+                        <td><%= current[i].attributes.owner %></td>
+                        <td><%= current[i].attributes.chdesc %></td>
+                        <td><%= current[i].attributes.active %></td>
+                    </tr>
+                <% } %>
+            </table><br/>
+            <input id="createChannel" type="button" value="Create channel">
+        </section>
+    </script>
+    <script type="text/template" id="template-channelFormPage">
+        <form id="form">
+            <header id="header_form"><br/>
+                <span id="title" class="underline dixHuit">Create your channel</span><br/><br/>
+                <span class="alert"></span><br/>
+            </header>
+            <table>
+            <tr id="tr_owner">
+                <td>Owner<span id="star"> *</span></td>
+                <td>
+                    <INPUT type=text id="owner" value=" " size="22" disabled="disabled"/>
+                </td>
+            </tr>
+            <tr id="tr_id">
+                <td>Id<span id="star"> *</span></td>
+                <td>
+                    <input id="chid" type=text  size="22"/>
+                </td>
+            </tr>
+            <tr id="tr_host">
+                <td>Host<span id="star"> *</span></td>
+                <td>
+                    <INPUT type=text id="host" size="22"/>
+                </td>
+            </tr>
+            <tr id="tr_desc">
+                <td>Description</td>
+                <td>
+                    <TEXTAREA rows="3"cols="30" name="chdesc" id="chdesc">Description du channel</TEXTAREA>
+                </td>
+            </tr>
+            <tr id="tr_priority">
+                <td>Priority</td>
+                <td>
+                    <SELECT name="priority" id="priority">
+                        <OPTION VALUE="trace">Trace</OPTION>
+                        <OPTION VALUE="info">Info</OPTION>
+                        <OPTION VALUE="warning">Warning</OPTION>
+                        <OPTION VALUE="alert">Alert</OPTION>
+                        <OPTION VALUE="critical">Critical</OPTION>
+                        <OPTION VALUE="panic">Panic</OPTION>
+                    </SELECT>
+                </td>
+            </tr>
+            <tr id="tr_location">
+                <td>Location_channel</td>
+                <td>
+                    Long : <INPUT type=text id="longitude" size="22"/><br/>
+                    Lat :  <INPUT type=text id="latitude" size="22"/><br/>
+                    ZIP :  <INPUT type=text id="zip" size="22"/><br/>
+                </td>
+            </tr>
+            <tr id="tr_participants">
+                <td>Participants<span id="star"> *</span></td>
+                <td>
+                    <INPUT type=text id="participants" size="22"/>
+                </td>
+            </tr>
+            <tr id="tr_active">
+                <td>Active<span id="star"> *</span></td>
+                <td>
+                    True : <INPUT type=radio name="active" value="true"/>
+                    <br>False : <INPUT type=radio name="active" value="false"/>
+                </td>
+            </tr>
+            <tr id="tr_headers">
+                <td>Headers</td>
+                <td>
+                    <INPUT type=text id="headers" size="22"/>
+                </td>
+            </tr>
+            </table><br/>
+            <input id="create" type="button" value="Create" onClick="testRadio(this.form.active)">
+            <input id="modify" type="button" value="Save" onClick="testRadio(this.form.active)">
+            <input id="cancel" type="button" value="Cancel">
+        </form>
+</html>

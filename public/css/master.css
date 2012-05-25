@@ -1,0 +1,117 @@
+/**********************************************************
+						BODY 
+**********************************************************/
+html, body{
+	background-color: silver;
+}
+
+header{
+	border-top: 3px solid grey;
+	border-bottom: 3px solid grey;
+}
+
+h1{
+	text-align: center;
+}
+
+#status{
+	float: right;
+}
+
+/**********************************************************
+					All classes !!! 
+**********************************************************/
+
+.underline{
+	text-decoration: underline;
+}
+
+.alert{
+	color: red;
+	text-decoration: none;
+}
+
+.quinze{
+	font-size: 18px;
+}
+
+.green{
+	color: green;
+}
+
+.red{
+	color: red;
+}
+
+.orange{
+	color: #FF6347;
+}
+
+/**********************************************************
+					All tables !!! 
+**********************************************************/
+
+table{
+	border-collapse:collapse;
+	margin: auto;
+}
+table th, table td{
+	border: 1px solid grey;
+}
+
+table th{
+	width: 200px;
+}
+
+/**********************************************************
+					List of channels 
+**********************************************************/
+
+#list{
+	text-align: center;
+}
+
+#channel td{
+	padding-top: 5px;
+	padding-bottom: 5px;
+
+}
+
+.selectedRow {
+  background-color: #696969;
+  cursor: pointer;
+}
+
+/**********************************************************
+			Form [Create - Edit] channels
+**********************************************************/
+
+#header_form{
+	border: none;
+	text-align: center;
+	font-weight: bold;
+}
+
+#form{
+	text-align: center;
+}
+
+#form td{
+	padding-left: 10px;
+	padding-top: 5px;
+	padding-bottom: 5px;
+	width: 250px;
+	text-align: left;
+}
+
+#star{
+	color: red;
+}
+
+#latitude{
+	margin-left: 12px;
+}
+
+#zip{
+	margin-left: 9px;
+}
