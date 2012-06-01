@@ -48,18 +48,14 @@ var idGetChann = null;
 var idCreateUpdateChann = null;
 
 var hOptions = {
-    serverHost: "localhost",
+    serverHost: "",
     serverPort: "",
-    transport: "socketio",
-    // endpoints: ["http://192.168.2.104:5280/http-bind"] BOSH
-    // endpoints: ["http://hub.novediagroup.com:5280/http-bind"]
-    endpoints: ["http://hub.novediagroup.com:8080/"]
-    // endpoints: ["http://192.168.2.104:8080/"] 
+    transport: "",
+    endpoints: ["http://"]
 };
 
 setTimeout(function(){
-    hClient.connect("u1@hub.novediagroup.com","u1",hCallback,hOptions);
-    // hClient.connect("u1@localhost","u1",hCallback,hOptions);
+    hClient.connect("username","password",hCallback,hOptions);
 },3000);
 
 function getChannels(){
