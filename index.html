@@ -21,8 +21,7 @@
         <div id="channels">
             <header>
                 <h1>Channel administration</h1>
-                <span id="status"></span>
-                
+                <span id="status"></span> 
             </header>
             <div id="channel_content"></div>
         </div>
@@ -38,7 +37,7 @@
                 <th>Description</th>
                 <th>Active</th>
                 <% for ( var i = 0 ; i < (current.length) ; i++ ) { %>
-                    <tr id="channel" class="row">
+                    <tr id="channel_row" class="row">
                         <td><%= current[i].attributes.chid %></td>
                         <td><%= current[i].attributes.host %></td>
                         <td><%= current[i].attributes.owner %></td>
@@ -117,13 +116,18 @@
             </tr>
             <tr id="tr_headers">
                 <td>Headers</td>
-                <td>
-                    <INPUT type=text id="headers" size="22"/>
+                <td id="header_inputs">
+                    hkey <INPUT type=text id="key1" size="2"/>
+                    hvalue <INPUT type=text id="value1" size="2"/>
+                    <input id="add" type="button" value="O" onClick="fAddInput(
+                        'text','key2','key2','Something')"/>
+                    <input id="delete" type="button" value="N" onClick="deleteHeaderLign()"/>
                 </td>
             </tr>
             </table><br/>
-            <input id="create" type="button" value="Create" onClick="testRadio(this.form.active)">
-            <input id="modify" type="button" value="Save" onClick="testRadio(this.form.active)">
-            <input id="cancel" type="button" value="Cancel">
+            <input id="create" type="button" value="Create" onClick="testRadio(this.form.active)"/>
+            <input id="modify" type="button" value="Save" onClick="testRadio(this.form.active)"/>
+            <input id="cancel" type="button" value="Cancel"/>
         </form>
+    </script>
 </html>

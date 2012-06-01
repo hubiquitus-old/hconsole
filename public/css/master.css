@@ -71,15 +71,14 @@ table th{
 	text-align: center;
 }
 
-#channel td{
+#channel_row td{
 	padding-top: 5px;
 	padding-bottom: 5px;
-
 }
 
-.selectedRow {
-  background-color: #696969;
-  cursor: pointer;
+.row:hover{
+	background-color: #696969;
+	cursor: pointer;
 }
 
 /**********************************************************

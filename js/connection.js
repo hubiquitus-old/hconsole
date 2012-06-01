@@ -19,8 +19,9 @@
 var idRow = null;
 var currentOwner = null;
 var current = [];
-var channels = null;
-var channel = new Channel();
+var channels = new Channels();
+var headerToAdded = false;
+var locationToAdded = false;
 
 var minimumRaised = false;
 
@@ -36,7 +37,9 @@ var hostRetrived = null;
 var ownerRetrived = null;
 var participantsRetrived = null;
 var activeRetrived = null;
-var headerRetrived = null;
+var headerBuilt = null;
+var hKeyRetrieved = null;
+var hValueRetrieved = null;
 
 var status = '';
 var error = '';
@@ -214,14 +217,73 @@ function populateForm(channelToEdit){
     $("#tr_headers td input").attr("value", headers);
 }
 
+function addHeaderLign(){
+    console.log("addHeaderLign");
+
+    var newRow = document.getElementById('tr_headers').insertRow(-1);
+
+    var newCell = newRow.insertCell(0);
+
+    newCell.innerHTML = '[nouveau nom]';
+
+    newCell = newRow.insertCell(1);
+
+    newCell.innerHTML = '[nouveau prenom]';
+    //headerToAdded = true;
+
+}
+
+function fAddInput(txtType, txtName, txtId, txtValue) 
+{ 
+    var newInput= document.createElement("input"); 
+    newInput.value= txtValue; 
+    newInput.name= txtName; 
+    newInput.id= txtId; 
+    newInput.type = txtType; 
+    $("#header_inputs").append(newInput); 
+} 
+
+function deleteHeaderLign(){
+    console.log("deleteHeaderLign")
+    // Test si dernier alors headerToAdded = false
+}
+
+function retrieveForm(){
+    idRetrived = document.getElementById("chid").value;
+    descRetrived = document.getElementById('chdesc').value;
+    priorityRetrived = document.getElementById('priority').value; 
+            
+    longRetrived = document.getElementById('longitude').value;
+    latRetrived = document.getElementById('latitude').value;
+    zipRetrived = document.getElementById('zip').value;
+
+    hostRetrived = document.getElementById('host').value;
+    ownerRetrived = document.getElementById('owner').value;
+    participantsRetrived = document.getElementById('participants').value;
+    hKeyRetrieved = document.getElementById('key1').value;
+    hValueRetrieved = document.getElementById('value1').value;
+    
+    priorityConverted = conversePriorityToCode(priorityRetrived);
+    locationBuilt = {lng:longRetrived, lat:latRetrived, zip:zipRetrived};
+    if(headerToAdded == true){headerBuilt = {hKey:hKeyRetrieved, hValue:hValueRetrieved};}
+    else{headerBuilt = {hKey:"", hValue:""};}
+
+}
+
+function editCollection(newChan){
+    channels.get(newChan.id).attributes = newChan;
+}
+
 function hCallback(msg){
-    console.log(JSON.stringify(msg));
+   // console.log(JSON.stringify(msg));
     if(msg.type == 'hStatus'){
         switch(msg.data.status){
             case hClient.status.CONNECTED:
                 status = 'Connected';
+                $(document).trigger('connected');
                 getChannels();
                 currentOwner = hClient.publisher;
+
                 break;
             case hClient.status.CONNECTING:
                 status = 'Connecting';
@@ -231,8 +293,9 @@ function hCallback(msg){
                 break;
             case hClient.status.REATTACHED:
                 status = 'Reattached';
-                currentOwner = hClient.publisher;
+                $(document).trigger('reattached');
                 getChannels();
+                currentOwner = hClient.publisher;
                 break;
             case hClient.status.DISCONNECTING:
                 status = 'Disconnecting';
@@ -308,20 +371,20 @@ function hCallback(msg){
         }
     }
     else if (msg.type == 'hResult'){
-        if(channels == null)
-            channels = new Channels();
-        
         if(msg.data.reqid == idGetChann){
             var result = msg.data.result;
 
             for(var i =0; i < result.length; i++){
+                result[i].id = result[i].chid;
                 channels.add(result[i]);
             }
-            console.log("Channels retrieved !")
+            console.log("All Channels retrieved !");
+            listChannelView.setCollection(channels);
         }else{
-            if(msg.data.status == 0)
+            if(msg.data.status == 0){
+                $(document).trigger('createUpdate');
                 console.log("Channel created & persisted !");
+            }
         }
-        listChannelView.setCollection(channels)
     }
 }

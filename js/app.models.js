@@ -1,6 +1,7 @@
 (function($) {
     window.Channel = Backbone.Model.extend({
         defaults : {
+            id : "undefined",
             chid : "undefined",
             chdesc : "undefined",
             priority : "undefined",
@@ -17,14 +18,13 @@
             });
             this.bind("change", function(model, error) {
                 console.log("MODEL UPDATED!");
-                channels.add(channel);
             });
         },
         validate: function (attrs) {
             if(attrs.chid == "" || attrs.host == "" 
                 || attrs.owner == "" || attrs.participants == "" 
                 || typeof attrs.active !== 'boolean'){
-                return minimumRaised = false;
+                return "Missing fields !"
             }else{
                 minimumRaised = true;
             }
@@ -39,7 +39,6 @@
     window.Channels = Backbone.Collection.extend({
         model : Channel,
         initialize : function Channels() {
-            // console.log('Toto collection Constructor');
             this.bind("error", function(model, error) {
                 console.log(error);
             });
