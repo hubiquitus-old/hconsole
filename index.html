@@ -117,11 +117,12 @@
             <tr id="tr_headers">
                 <td>Headers</td>
                 <td id="header_inputs">
-                    hkey <INPUT type=text id="key1" size="2"/>
-                    hvalue <INPUT type=text id="value1" size="2"/>
-                    <input id="add" type="button" value="O" onClick="fAddInput(
-                        'text','key2','key2','Something')"/>
-                    <input id="delete" type="button" value="N" onClick="deleteHeaderLign()"/>
+                    <div id="header1">
+                        hkey : <input type=text id="key1" size="2"/>
+                        hvalue : <input type=text id="value1" size="2"/>
+                        <input id="add1" type="button" value="O" onClick="addHeaderInputs(1)"/>
+                        <input id="delete1" type="button" value="N" style="display:none;" onClick="deleteHeaderInputs(this)"/>
+                    </div>
                 </td>
             </tr>
             </table><br/>

@@ -28,7 +28,7 @@
         render: function(){
             $(this.el).empty();
             $(this.el).append(this.template ({"current": this.collection.models}));
-            console.log("Render called!");
+            // console.log("Render called!");
             return this;
         },
         setCollection: function(_collection){
@@ -78,13 +78,13 @@
                 });
                 return this;
             }else{
-                $(".alert").html("You have to fill all required fields");
+                 $(".alert").html("You have to fill all required fields");
             }
         },
         initialize: function(){
             this.template = _.template($('#template-channelFormPage').html());
             _.bindAll(this,"render");
-            console.log("Form (to create) initialized");
+            // console.log("Form (to create) initialized");
         },
         render: function(){
             $(this.el).empty();
@@ -108,7 +108,7 @@
         },
         editChannel: function(){
             retrieveForm();
-
+            
             var channRecup = new Channel();
             channRecup.set({
                 id: idRetrived,
@@ -138,7 +138,7 @@
         initialize: function(){
             this.template = _.template($('#template-channelFormPage').html());
             _.bindAll(this,"render");
-            console.log("Form (to edit) initialized");
+            // console.log("Form (to edit) initialized");
         },
         render: function(){
             $(this.el).empty();

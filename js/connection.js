@@ -16,12 +16,12 @@
  *     You should have received a copy of the GNU General Public License
  *     along with Hubiquitus.  If not, see <http://www.gnu.org/licenses/>.
  */
+var headerPersisted = {};
+var publicCounter = 0;
 var idRow = null;
 var currentOwner = null;
 var current = [];
 var channels = new Channels();
-var headerToAdded = false;
-var locationToAdded = false;
 
 var minimumRaised = false;
 
@@ -37,7 +37,7 @@ var hostRetrived = null;
 var ownerRetrived = null;
 var participantsRetrived = null;
 var activeRetrived = null;
-var headerBuilt = null;
+var headerBuilt = [];
 var hKeyRetrieved = null;
 var hValueRetrieved = null;
 
@@ -48,14 +48,18 @@ var idGetChann = null;
 var idCreateUpdateChann = null;
 
 var hOptions = {
-    serverHost: "",
+    serverHost: "localhost",
     serverPort: "",
-    transport: "",
-    endpoints: ["http://"]
+    transport: "socketio",
+    // endpoints: ["http://192.168.2.104:5280/http-bind"] BOSH
+    // endpoints: ["http://hub.novediagroup.com:5280/http-bind"]
+    endpoints: ["http://hub.novediagroup.com:8080/"]
+    // endpoints: ["http://192.168.2.104:8080/"] 
 };
 
 setTimeout(function(){
-    hClient.connect("username","password",hCallback,hOptions);
+    hClient.connect("u1@hub.novediagroup.com","u1",hCallback,hOptions);
+    // hClient.connect("u1@localhost","u1",hCallback,hOptions);
 },3000);
 
 function getChannels(){
@@ -69,7 +73,7 @@ function getChannels(){
 }
 
 function createUpdateChannel(theChannel){
-    console.log(theChannel);
+    // console.log(theChannel);
     var commandCreateUpdateChann = {
         entity : 'hnode.' + hClient.domain,
         cmd : 'hcreateupdatechannel',
@@ -136,6 +140,7 @@ function testRadio(radio){
 
 function populateForm(channelToEdit){
     console.log(channelToEdit);
+
     var id = channelToEdit.chid;
     var desc = channelToEdit.chdesc;
     var priority = conversePriorityToString(channelToEdit.priority); 
@@ -161,13 +166,17 @@ function populateForm(channelToEdit){
     }
 
     var active = channelToEdit.active;
-    var headers = "";
-    
-    if(channelToEdit.headers !== "Array"){
-        headers = channelToEdit.headers;
+
+    for(var i = 0; i < channelToEdit.headers.length; i++){
+        if(i==(channelToEdit.headers.length-1))
+        {
+            headerPopulateForm(channelToEdit.headers[i].hKey, channelToEdit.headers[i].hValue, i+1,true);
+        }else{
+            headerPopulateForm(channelToEdit.headers[i].hKey, channelToEdit.headers[i].hValue, i+1,false);
+        }
     }
 
-    console.log("ID "+id);
+    /*console.log("ID "+id);
     console.log("DESC "+desc);
     console.log("PRIORITY " +priority);
     console.log("LONG "+lng);
@@ -178,7 +187,7 @@ function populateForm(channelToEdit){
     console.log("PARTICIPANTS ")
     console.log(participants);
     console.log("ACTIVE "+active);
-    console.log("HEADERS "+headers);
+    console.log("HEADERS "+headers);*/
 
 
     $("#tr_id td input").attr("value", id);
@@ -209,42 +218,147 @@ function populateForm(channelToEdit){
             document.getElementById("tr_active").getElementsByTagName("input")[i].setAttribute("checked", "checked");
         }
     }
-
-    $("#tr_headers td input").attr("value", headers);
+    
 }
 
-function addHeaderLign(){
-    console.log("addHeaderLign");
+function headerPopulateForm(key,value,index,last){
+    if(index==1){
+        $("#key"+index).attr("value",key);
+        $("#value"+index).attr("value",value);
+        $("#delete"+index).css("display", "inline");
+        $("#add"+index).attr("disabled","disabled");
+        $("#key"+index).attr("disabled","disabled");
+        $("#value"+index).attr("disabled","disabled");
+    }else{
+        var new_div = jQuery ('<div id="header'+index+'"></div>');
+        $("#header_inputs").append(new_div);
 
-    var newRow = document.getElementById('tr_headers').insertRow(-1);
+        var keyInput = document.createElement("input"); 
+        keyInput.type = "text";
+        keyInput.id = "key"+index;  
+        keyInput.size = 2; 
+        keyInput.value = key;
+        $("#header"+index).append("hkey : ");
+        $("#header"+index).append(keyInput);
+        
+        var valueInput = document.createElement("input"); 
+        valueInput.type = "text"; 
+        valueInput.id = "value"+index;
+        valueInput.size = 2;  
+        valueInput.value = value;
+        $("#header"+index).append(" hvalue : ");
+        $("#header"+index).append(valueInput);  
 
-    var newCell = newRow.insertCell(0);
+        $("#header"+index).append(" ");
 
-    newCell.innerHTML = '[nouveau nom]';
+        var addInput = document.createElement("input"); 
+        addInput.id = "add"+index;
+        addInput.type = "button";
+        addInput.value = "O";
+        addInput.setAttribute("disabled", "disabled");
+        $("#header"+index).append(addInput); 
 
-    newCell = newRow.insertCell(1);
+        $("#header"+index).append(" ");
 
-    newCell.innerHTML = '[nouveau prenom]';
-    //headerToAdded = true;
+        var deleteInput = document.createElement("input"); 
+        deleteInput.id = "delete"+index;
+        deleteInput.type = "button";
+        deleteInput.value = "N";
+        deleteInput.setAttribute("onClick","deleteHeaderInputs(this)");
+        $("#header"+index).append(deleteInput); 
 
+        $("#header_inputs input:#key"+index).attr("disabled","disabled");
+        $("#header_inputs input:#value"+index).attr("disabled","disabled");
+        $("#header_inputs input:#add"+index).attr("disabled","disabled");
+    }
+    if(last==true){
+        addHeaderInputs(index);
+    }
+
+    //Persist objets into a var
+    headerPersisted[index] = {
+        hKey:$("#key"+index).val(),
+        hValue: $("#value"+index).val()
+    }
 }
 
-function fAddInput(txtType, txtName, txtId, txtValue) 
-{ 
-    var newInput= document.createElement("input"); 
-    newInput.value= txtValue; 
-    newInput.name= txtName; 
-    newInput.id= txtId; 
-    newInput.type = txtType; 
-    $("#header_inputs").append(newInput); 
+function addHeaderInputs(counter) {
+    //Avoid the user to delete any header
+    $("#delete"+counter).css("display", "inline");
+    
+    //Update compteurs
+    if(publicCounter != counter)
+        publicCounter = counter;
+    publicCounter++;
+
+    //Persist objets into a var
+    headerPersisted[counter] = {
+        hKey:$("#key"+counter).val(),
+        hValue: $("#value"+counter).val()
+    }
+
+    //Avoid headers edition.
+    $("#header_inputs input:#key"+counter).attr("disabled","disabled");
+    $("#header_inputs input:#value"+counter).attr("disabled","disabled");
+    $("#header_inputs input:#add"+counter).attr("disabled","disabled");
+
+    var new_div = jQuery ('<div id="header'+publicCounter+'"></div>');
+    $("#header_inputs").append(new_div);
+
+    var keyInput = document.createElement("input"); 
+    keyInput.type = "text";
+    keyInput.id = "key"+publicCounter;  
+    keyInput.size = 2; 
+    $("#header"+publicCounter).append("hkey : ");
+    $("#header"+publicCounter).append(keyInput);
+    
+    var valueInput = document.createElement("input"); 
+    valueInput.type = "text"; 
+    valueInput.id = "value"+publicCounter;
+    valueInput.size = 2;  
+    $("#header"+publicCounter).append(" hvalue : ");
+    $("#header"+publicCounter).append(valueInput);  
+
+    $("#header"+publicCounter).append(" ");
+
+    var addInput = document.createElement("input"); 
+    addInput.id = "add"+publicCounter;
+    addInput.type = "button";
+    addInput.value = "O";
+    addInput.setAttribute("onClick","addHeaderInputs(publicCounter)")
+    $("#header"+publicCounter).append(addInput); 
+
+    $("#header"+publicCounter).append(" ");
+
+    var deleteInput = document.createElement("input"); 
+    deleteInput.id = "delete"+publicCounter;
+    deleteInput.type = "button";
+    deleteInput.value = "N";
+    deleteInput.setAttribute("style","display:none");
+    deleteInput.setAttribute("onClick","deleteHeaderInputs(this)");
+    $("#header"+publicCounter).append(deleteInput); 
+    
+    console.log(headerPersisted);
 } 
 
-function deleteHeaderLign(){
-    console.log("deleteHeaderLign")
-    // Test si dernier alors headerToAdded = false
+function deleteHeaderInputs(inputDelete){
+    var identifier = inputDelete.id.replace("delete","");
+
+    $("#header"+identifier).remove();
+    
+    delete headerPersisted[identifier];
+    
+    console.log("Apres delete");
+    console.log(headerPersisted);
 }
 
 function retrieveForm(){
+    headerBuilt = [];
+    console.log("headerBuilt");
+    console.log(headerBuilt);
+    console.log("headerPersisted");
+    console.log(headerPersisted);
+
     idRetrived = document.getElementById("chid").value;
     descRetrived = document.getElementById('chdesc').value;
     priorityRetrived = document.getElementById('priority').value; 
@@ -256,14 +370,16 @@ function retrieveForm(){
     hostRetrived = document.getElementById('host').value;
     ownerRetrived = document.getElementById('owner').value;
     participantsRetrived = document.getElementById('participants').value;
-    hKeyRetrieved = document.getElementById('key1').value;
-    hValueRetrieved = document.getElementById('value1').value;
     
     priorityConverted = conversePriorityToCode(priorityRetrived);
     locationBuilt = {lng:longRetrived, lat:latRetrived, zip:zipRetrived};
-    if(headerToAdded == true){headerBuilt = {hKey:hKeyRetrieved, hValue:hValueRetrieved};}
-    else{headerBuilt = {hKey:"", hValue:""};}
 
+    for(var attr in headerPersisted){
+        if(headerPersisted.hasOwnProperty(attr))
+            headerBuilt.push(headerPersisted[attr]);
+    }
+
+    headerPersisted = {};
 }
 
 function editCollection(newChan){
@@ -380,6 +496,8 @@ function hCallback(msg){
             if(msg.data.status == 0){
                 $(document).trigger('createUpdate');
                 console.log("Channel created & persisted !");
+            }else{
+                console.log("ERROR !!!" + msg.data.status)
             }
         }
     }
