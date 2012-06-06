@@ -29,7 +29,6 @@ var listChannelView,
             $("#create").css("display", "none");
 
             var channelToEdit = channels.filter(function(channel){return channel.getChid() == idRow});
-            // console.log(channelToEdit);
             channelToEdit = channelToEdit[0].attributes;
             populateForm(channelToEdit);
 

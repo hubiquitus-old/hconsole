@@ -16,8 +16,11 @@
  *     You should have received a copy of the GNU General Public License
  *     along with Hubiquitus.  If not, see <http://www.gnu.org/licenses/>.
  */
-var headerPersisted = {};
+var headersPersisted = {};
+var participantsPersisted = {};
+var participant
 var publicCounter = 0;
+var participantCounter = 0;
 var idRow = null;
 var currentOwner = null;
 var current = [];
@@ -35,7 +38,7 @@ var latRetrived = null;
 var zipRetrived = null;
 var hostRetrived = null;
 var ownerRetrived = null;
-var participantsRetrived = null;
+var participantBuilt = [];
 var activeRetrived = null;
 var headerBuilt = [];
 var hKeyRetrieved = null;
@@ -139,6 +142,7 @@ function testRadio(radio){
 }
 
 function populateForm(channelToEdit){
+    console.log("Le formulaire va etre rempli avec l'objet suivant :");
     console.log(channelToEdit);
 
     var id = channelToEdit.chid;
@@ -157,12 +161,20 @@ function populateForm(channelToEdit){
     var host = channelToEdit.host;
     var owner = channelToEdit.owner;
 
-    var participants = "";
+    /*var participants = "";
     for(var i=0; i< channelToEdit.participants.length; i++){
-        channelToEdit.participants[i] = channelToEdit.participants[i].replace(/ */g,"");
-        participants += channelToEdit.participants[i];
+        channelToEdit.participants[i] = channelToEdit.participants[i].replace(/ *///g,"");
+        /*participants += channelToEdit.participants[i];
         if(channelToEdit.participants[i+1])
             participants += ", ";
+    }*/
+
+    for(var i = 0; i< channelToEdit.participants.length; i++){
+        if(i==(channelToEdit.participants.length-1)){
+            participantPopulateForm(channelToEdit.participants[i], i+1, true);
+        }else{
+            participantPopulateForm(channelToEdit.participants[i], i+1, false);
+        }    
     }
 
     var active = channelToEdit.active;
@@ -210,23 +222,66 @@ function populateForm(channelToEdit){
     $("#tr_location td input#longitude").attr("value", lng);
     $("#tr_location td input#latitude").attr("value", lat);
     $("#tr_location td input#zip").attr("value", zip);
-
-    $("#tr_participants td input").attr("value", participants);
     
     for(var i =0; i<document.getElementById("tr_active").getElementsByTagName("input").length; i++){
         if(document.getElementById("tr_active").getElementsByTagName("input")[i].value == ''+active){
             document.getElementById("tr_active").getElementsByTagName("input")[i].setAttribute("checked", "checked");
         }
+    }   
+}
+
+function participantPopulateForm(theParticipant,index,last){
+    if(index==1){
+        $("#jid_participant"+index).attr("value",theParticipant);
+        $("#deleteParticipant"+index).css("display","inline");
+        $("#addParticipant"+index).attr("disabled","disabled");
+        $("#jid_participant"+index).attr("disabled","disabled");
+    }else{
+        var new_div = jQuery ('<div id="participant'+index+'"></div>');
+        $("#participants_input").append(new_div);
+
+        var participantInput = document.createElement("input");
+        participantInput.id = "jid_participant"+index;  
+        participantInput.type = "text"; 
+        participantInput.size = 22; 
+        participantInput.value = theParticipant;
+        $("#participant"+index).append(participantInput);
+        
+        $("#participant"+index).append(" ");
+
+        var addInput = document.createElement("input"); 
+        addInput.id = "addParticipant"+index;
+        addInput.type = "button";
+        addInput.value = "A";
+        addInput.setAttribute("disabled", "disabled");
+        $("#participant"+index).append(addInput); 
+
+        $("#participant"+index).append(" ");
+
+        var deleteInput = document.createElement("input"); 
+        deleteInput.id = "deleteParticipant"+index;
+        deleteInput.type = "button";
+        deleteInput.value = "X";
+        deleteInput.setAttribute("onClick","deleteInputs(this)");
+        $("#participant"+index).append(deleteInput); 
+        
+        $("#participants_input input:#jid_participant"+index).attr("disabled","disabled");
+        $("#participants_input input:#addParticipant"+index).attr("disabled","disabled");
     }
-    
+
+    if(last==true){
+        addParticipantInput(index);
+    }
+
+    participantsPersisted[index] = $("#jid_participant"+index).val();
 }
 
 function headerPopulateForm(key,value,index,last){
     if(index==1){
         $("#key"+index).attr("value",key);
         $("#value"+index).attr("value",value);
-        $("#delete"+index).css("display", "inline");
-        $("#add"+index).attr("disabled","disabled");
+        $("#deleteHeader"+index).css("display", "inline");
+        $("#addHeader"+index).attr("disabled","disabled");
         $("#key"+index).attr("disabled","disabled");
         $("#value"+index).attr("disabled","disabled");
     }else{
@@ -252,31 +307,31 @@ function headerPopulateForm(key,value,index,last){
         $("#header"+index).append(" ");
 
         var addInput = document.createElement("input"); 
-        addInput.id = "add"+index;
+        addInput.id = "addHeader"+index;
         addInput.type = "button";
-        addInput.value = "O";
+        addInput.value = "A";
         addInput.setAttribute("disabled", "disabled");
         $("#header"+index).append(addInput); 
 
         $("#header"+index).append(" ");
 
         var deleteInput = document.createElement("input"); 
-        deleteInput.id = "delete"+index;
+        deleteInput.id = "deleteHeader"+index;
         deleteInput.type = "button";
-        deleteInput.value = "N";
-        deleteInput.setAttribute("onClick","deleteHeaderInputs(this)");
+        deleteInput.value = "X";
+        deleteInput.setAttribute("onClick","deleteInputs(this)");
         $("#header"+index).append(deleteInput); 
 
         $("#header_inputs input:#key"+index).attr("disabled","disabled");
         $("#header_inputs input:#value"+index).attr("disabled","disabled");
-        $("#header_inputs input:#add"+index).attr("disabled","disabled");
+        $("#header_inputs input:#addHeader"+index).attr("disabled","disabled");
     }
     if(last==true){
         addHeaderInputs(index);
     }
 
     //Persist objets into a var
-    headerPersisted[index] = {
+    headersPersisted[index] = {
         hKey:$("#key"+index).val(),
         hValue: $("#value"+index).val()
     }
@@ -284,7 +339,7 @@ function headerPopulateForm(key,value,index,last){
 
 function addHeaderInputs(counter) {
     //Avoid the user to delete any header
-    $("#delete"+counter).css("display", "inline");
+    $("#deleteHeader"+counter).css("display", "inline");
     
     //Update compteurs
     if(publicCounter != counter)
@@ -292,7 +347,7 @@ function addHeaderInputs(counter) {
     publicCounter++;
 
     //Persist objets into a var
-    headerPersisted[counter] = {
+    headersPersisted[counter] = {
         hKey:$("#key"+counter).val(),
         hValue: $("#value"+counter).val()
     }
@@ -300,7 +355,7 @@ function addHeaderInputs(counter) {
     //Avoid headers edition.
     $("#header_inputs input:#key"+counter).attr("disabled","disabled");
     $("#header_inputs input:#value"+counter).attr("disabled","disabled");
-    $("#header_inputs input:#add"+counter).attr("disabled","disabled");
+    $("#header_inputs input:#addHeader"+counter).attr("disabled","disabled");
 
     var new_div = jQuery ('<div id="header'+publicCounter+'"></div>');
     $("#header_inputs").append(new_div);
@@ -322,42 +377,88 @@ function addHeaderInputs(counter) {
     $("#header"+publicCounter).append(" ");
 
     var addInput = document.createElement("input"); 
-    addInput.id = "add"+publicCounter;
+    addInput.id = "addHeader"+publicCounter;
     addInput.type = "button";
-    addInput.value = "O";
+    addInput.value = "A";
     addInput.setAttribute("onClick","addHeaderInputs(publicCounter)")
     $("#header"+publicCounter).append(addInput); 
 
     $("#header"+publicCounter).append(" ");
 
     var deleteInput = document.createElement("input"); 
-    deleteInput.id = "delete"+publicCounter;
+    deleteInput.id = "deleteHeader"+publicCounter;
     deleteInput.type = "button";
-    deleteInput.value = "N";
+    deleteInput.value = "X";
     deleteInput.setAttribute("style","display:none");
-    deleteInput.setAttribute("onClick","deleteHeaderInputs(this)");
+    deleteInput.setAttribute("onClick","deleteInputs(this)");
     $("#header"+publicCounter).append(deleteInput); 
-    
-    console.log(headerPersisted);
 } 
 
-function deleteHeaderInputs(inputDelete){
-    var identifier = inputDelete.id.replace("delete","");
+function addParticipantInput(counter){
+    $("#deleteParticipant"+counter).css("display", "inline");
 
-    $("#header"+identifier).remove();
+    if(participantCounter != counter)
+        participantCounter = counter;
+    participantCounter++;
+
+    $("#participants_input input:#jid_participant"+counter).attr("disabled","disabled");
+    $("#participants_input input:#addParticipant"+counter).attr("disabled","disabled");
+
+    var new_div = jQuery ('<div id="participant'+participantCounter+'"></div>');
+    $("#participants_input").append(new_div);
+
+    var participantInput = document.createElement("input");
+    participantInput.id = "jid_participant"+participantCounter;  
+    participantInput.type = "text"; 
+    participantInput.size = 22; 
+    $("#participant"+participantCounter).append(participantInput);
     
-    delete headerPersisted[identifier];
-    
-    console.log("Apres delete");
-    console.log(headerPersisted);
+    $("#participant"+participantCounter).append(" ");
+
+    var addInput = document.createElement("input"); 
+    addInput.id = "addParticipant"+participantCounter;
+    addInput.type = "button";
+    addInput.value = "A";
+    addInput.setAttribute("onClick","addParticipantInput(participantCounter)")
+    $("#participant"+participantCounter).append(addInput); 
+
+    $("#participant"+participantCounter).append(" ");
+
+    var deleteInput = document.createElement("input"); 
+    deleteInput.id = "deleteParticipant"+participantCounter;
+    deleteInput.type = "button";
+    deleteInput.value = "X";
+    deleteInput.setAttribute("style","display:none");
+    deleteInput.setAttribute("onClick","deleteInputs(this)");
+    $("#participant"+participantCounter).append(deleteInput); 
+
+    //Persist element into an object !!! TODO
+    participantsPersisted[counter] = $("#jid_participant"+counter).val();
+}
+
+function deleteInputs(inputToDelete){
+    var whichOne = inputToDelete.id.indexOf("deleteHeader");
+    var identifier = null;
+    if(whichOne != -1){
+        console.log("DELETE ONE HEADER");
+        identifier = inputToDelete.id.replace("deleteHeader","");
+
+        $("#header"+identifier).remove();
+        
+        delete headersPersisted[identifier];
+    }else if(whichOne == -1){
+        console.log("DELETE ONE PARTICIPANT");
+        identifier = inputToDelete.id.replace("deleteParticipant","")
+
+        $("#participant"+identifier).remove();
+
+        delete participantsPersisted[identifier];
+    }   
 }
 
 function retrieveForm(){
     headerBuilt = [];
-    console.log("headerBuilt");
-    console.log(headerBuilt);
-    console.log("headerPersisted");
-    console.log(headerPersisted);
+    participantBuilt = [];
 
     idRetrived = document.getElementById("chid").value;
     descRetrived = document.getElementById('chdesc').value;
@@ -369,17 +470,22 @@ function retrieveForm(){
 
     hostRetrived = document.getElementById('host').value;
     ownerRetrived = document.getElementById('owner').value;
-    participantsRetrived = document.getElementById('participants').value;
+
+    for(var attr in participantsPersisted){
+        if(participantsPersisted.hasOwnProperty(attr))
+            participantBuilt.push(participantsPersisted[attr]);
+    }
     
     priorityConverted = conversePriorityToCode(priorityRetrived);
     locationBuilt = {lng:longRetrived, lat:latRetrived, zip:zipRetrived};
 
-    for(var attr in headerPersisted){
-        if(headerPersisted.hasOwnProperty(attr))
-            headerBuilt.push(headerPersisted[attr]);
+    for(var attr in headersPersisted){
+        if(headersPersisted.hasOwnProperty(attr))
+            headerBuilt.push(headersPersisted[attr]);
     }
 
-    headerPersisted = {};
+    headersPersisted = {};
+    participantsPersisted = {};
 }
 
 function editCollection(newChan){

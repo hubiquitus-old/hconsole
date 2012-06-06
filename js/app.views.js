@@ -53,7 +53,7 @@
         },
         createChannel: function(){
             retrieveForm();
-            
+
             var channelToCreate = new Channel();
             channelToCreate.set({
                 id : idRetrived,
@@ -63,7 +63,7 @@
                 location : locationBuilt,
                 host : hostRetrived,
                 owner : ownerRetrived,
-                participants : participantsRetrived.replace(/ */g,"").split(","),
+                participants : participantBuilt,
                 active : activeRetrived,
                 headers : headerBuilt
             });
@@ -76,6 +76,7 @@
                 $(document).bind('createUpdate', function () {
                     router.navigate("", {trigger: true});
                 });
+                minimumRaised = false;
                 return this;
             }else{
                  $(".alert").html("You have to fill all required fields");
@@ -108,7 +109,7 @@
         },
         editChannel: function(){
             retrieveForm();
-            
+
             var channRecup = new Channel();
             channRecup.set({
                 id: idRetrived,
@@ -118,18 +119,20 @@
                 location : locationBuilt,
                 host : hostRetrived,
                 owner : ownerRetrived,
-                participants : participantsRetrived.replace(" ","").split(","),
+                participants : participantBuilt,
                 active : activeRetrived,
                 headers : headerBuilt
             });
-            
-            editCollection(channRecup.attributes);
+            console.log("ChannRecupéré du formulaire avant édition finale :");
+            console.log(channRecup);
 
-            if(minimumRaised==true){  
+            if(minimumRaised == true){ 
+                editCollection(channRecup.attributes);
                 createUpdateChannel(channRecup);
                 $(document).bind('createUpdate', function () {
                     router.navigate("", {trigger: true});
                 });
+                minimumRaised = false;
                 return this;
             }else{
                 $(".alert").html("You have to fill all required fields");

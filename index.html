@@ -103,8 +103,14 @@
             </tr>
             <tr id="tr_participants">
                 <td>Participants<span id="star"> *</span></td>
-                <td>
-                    <INPUT type=text id="participants" size="22"/>
+                <td id="participants_input">
+                    <div id="participant1">
+                        <input type=text id="jid_participant1" size="22"/>
+                        <input type=button id="addParticipant1" value="A" 
+                            onClick="addParticipantInput(1)"/>
+                        <input type=button id="deleteParticipant1" value="X" style="display:none;" 
+                            onClick="deleteInputs(this)"/>
+                    </div>
                 </td>
             </tr>
             <tr id="tr_active">
@@ -120,8 +126,10 @@
                     <div id="header1">
                         hkey : <input type=text id="key1" size="2"/>
                         hvalue : <input type=text id="value1" size="2"/>
-                        <input id="add1" type="button" value="O" onClick="addHeaderInputs(1)"/>
-                        <input id="delete1" type="button" value="N" style="display:none;" onClick="deleteHeaderInputs(this)"/>
+                        <input id="addHeader1" class="add" 
+                            type="button" value="A" onClick="addHeaderInputs(1)"/>
+                        <input id="deleteHeader1" class="delete" type="button" value="X" 
+                            style="display:none;" onClick="deleteInputs(this)"/>
                     </div>
                 </td>
             </tr>

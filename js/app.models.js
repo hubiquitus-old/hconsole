@@ -22,7 +22,7 @@
         },
         validate: function (attrs) {
             if(attrs.chid == "" || attrs.host == "" 
-                || attrs.owner == "" || attrs.participants == "" 
+                || attrs.owner == "" || attrs.participants.length == 0
                 || typeof attrs.active !== 'boolean'){
                 return "Missing fields !"
             }else{

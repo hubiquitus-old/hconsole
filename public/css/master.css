@@ -47,6 +47,14 @@ h1{
 	color: #FF6347;
 }
 
+.add{
+	background-image:url("../img/check.jpg");
+}
+
+.delete{
+	background-image:url("../img/cross.jpg");
+}
+
 /**********************************************************
 					All tables !!! 
 **********************************************************/
