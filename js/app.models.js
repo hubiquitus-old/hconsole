@@ -17,6 +17,7 @@
                 console.log(error);
             });
             this.bind("change", function(model, error) {
+                minimumRaised = true;
                 console.log("MODEL UPDATED!");
             });
         },
@@ -25,9 +26,10 @@
                 || attrs.owner == "" || attrs.participants.length == 0
                 || typeof attrs.active !== 'boolean'){
                 return "Missing fields !"
-            }else{
+            }/*else{
+                console.log("ICI !");
                 minimumRaised = true;
-            }
+            }*/
         },
         getChid : function() {
             return this.get('chid');
