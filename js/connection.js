@@ -56,12 +56,12 @@ var hOptions = {
     transport: "socketio",
     // endpoints: ["http://192.168.2.104:5280/http-bind"] BOSH
     // endpoints: ["http://hub.novediagroup.com:5280/http-bind"]
-    endpoints: ["http://hub.novediagroup.com:8080/"]
-    // endpoints: ["http://192.168.2.104:8080/"] 
+    // endpoints: ["http://hub.novediagroup.com:8080/"]
+    endpoints: ["http://192.168.2.100:8080/"] 
 };
 
 setTimeout(function(){
-    hClient.connect("u1@hub.novediagroup.com","u1",hCallback,hOptions);
+    hClient.connect("u1@localhost","u1",hCallback,hOptions);
     // hClient.connect("u1@localhost","u1",hCallback,hOptions);
 },3000);
 
@@ -76,7 +76,6 @@ function getChannels(){
 }
 
 function createUpdateChannel(theChannel){
-    // console.log(theChannel);
     var commandCreateUpdateChann = {
         entity : 'hnode.' + hClient.domain,
         cmd : 'hcreateupdatechannel',
@@ -161,14 +160,6 @@ function populateForm(channelToEdit){
     var host = channelToEdit.host;
     var owner = channelToEdit.owner;
 
-    /*var participants = "";
-    for(var i=0; i< channelToEdit.participants.length; i++){
-        channelToEdit.participants[i] = channelToEdit.participants[i].replace(/ *///g,"");
-        /*participants += channelToEdit.participants[i];
-        if(channelToEdit.participants[i+1])
-            participants += ", ";
-    }*/
-
     for(var i = 0; i< channelToEdit.participants.length; i++){
         if(i==(channelToEdit.participants.length-1)){
             participantPopulateForm(channelToEdit.participants[i], i+1, true);
@@ -187,20 +178,6 @@ function populateForm(channelToEdit){
             headerPopulateForm(channelToEdit.headers[i].hKey, channelToEdit.headers[i].hValue, i+1,false);
         }
     }
-
-    /*console.log("ID "+id);
-    console.log("DESC "+desc);
-    console.log("PRIORITY " +priority);
-    console.log("LONG "+lng);
-    console.log("LAT "+lat);
-    console.log("ZIP "+zip);
-    console.log("HOST "+host);
-    console.log("OWNER "+owner);
-    console.log("PARTICIPANTS ")
-    console.log(participants);
-    console.log("ACTIVE "+active);
-    console.log("HEADERS "+headers);*/
-
 
     $("#tr_id td input").attr("value", id);
     $("#tr_id td input").attr("disabled", "disabled");
@@ -338,102 +315,114 @@ function headerPopulateForm(key,value,index,last){
 }
 
 function addHeaderInputs(counter) {
-    //Avoid the user to delete any header
-    $("#deleteHeader"+counter).css("display", "inline");
-    
-    //Update compteurs
-    if(publicCounter != counter)
-        publicCounter = counter;
-    publicCounter++;
 
-    //Persist objets into a var
-    headersPersisted[counter] = {
-        hKey:$("#key"+counter).val(),
-        hValue: $("#value"+counter).val()
+    if($("#key"+counter).val()=="" || $("#value"+counter).val()==""){
+        alert("You have to inform key and value to add an header");
+    }else{
+        //Avoid the user to delete any header
+        $("#deleteHeader"+counter).css("display", "inline");
+        
+        //Update compteurs
+        if(publicCounter != counter)
+            publicCounter = counter;
+        publicCounter++;
+
+        //Persist objets into a var
+        headersPersisted[counter] = {
+            hKey:$("#key"+counter).val(),
+            hValue: $("#value"+counter).val()
+        }
+
+        //Avoid headers edition.
+        $("#header_inputs input:#key"+counter).attr("disabled","disabled");
+        $("#header_inputs input:#value"+counter).attr("disabled","disabled");
+        $("#header_inputs input:#addHeader"+counter).attr("disabled","disabled");
+
+        var new_div = jQuery ('<div id="header'+publicCounter+'"></div>');
+        $("#header_inputs").append(new_div);
+
+        var keyInput = document.createElement("input"); 
+        keyInput.type = "text";
+        keyInput.id = "key"+publicCounter;  
+        keyInput.size = 2; 
+        $("#header"+publicCounter).append("hkey : ");
+        $("#header"+publicCounter).append(keyInput);
+        
+        var valueInput = document.createElement("input"); 
+        valueInput.type = "text"; 
+        valueInput.id = "value"+publicCounter;
+        valueInput.size = 2;  
+        $("#header"+publicCounter).append(" hvalue : ");
+        $("#header"+publicCounter).append(valueInput);  
+
+        $("#header"+publicCounter).append(" ");
+
+        var addInput = document.createElement("input"); 
+        addInput.id = "addHeader"+publicCounter;
+        addInput.type = "button";
+        addInput.value = "A";
+        addInput.setAttribute("onClick","addHeaderInputs(publicCounter)")
+        $("#header"+publicCounter).append(addInput); 
+
+        $("#header"+publicCounter).append(" ");
+
+        var deleteInput = document.createElement("input"); 
+        deleteInput.id = "deleteHeader"+publicCounter;
+        deleteInput.type = "button";
+        deleteInput.value = "X";
+        deleteInput.setAttribute("style","display:none");
+        deleteInput.setAttribute("onClick","deleteInputs(this)");
+        $("#header"+publicCounter).append(deleteInput); 
     }
-
-    //Avoid headers edition.
-    $("#header_inputs input:#key"+counter).attr("disabled","disabled");
-    $("#header_inputs input:#value"+counter).attr("disabled","disabled");
-    $("#header_inputs input:#addHeader"+counter).attr("disabled","disabled");
-
-    var new_div = jQuery ('<div id="header'+publicCounter+'"></div>');
-    $("#header_inputs").append(new_div);
-
-    var keyInput = document.createElement("input"); 
-    keyInput.type = "text";
-    keyInput.id = "key"+publicCounter;  
-    keyInput.size = 2; 
-    $("#header"+publicCounter).append("hkey : ");
-    $("#header"+publicCounter).append(keyInput);
-    
-    var valueInput = document.createElement("input"); 
-    valueInput.type = "text"; 
-    valueInput.id = "value"+publicCounter;
-    valueInput.size = 2;  
-    $("#header"+publicCounter).append(" hvalue : ");
-    $("#header"+publicCounter).append(valueInput);  
-
-    $("#header"+publicCounter).append(" ");
-
-    var addInput = document.createElement("input"); 
-    addInput.id = "addHeader"+publicCounter;
-    addInput.type = "button";
-    addInput.value = "A";
-    addInput.setAttribute("onClick","addHeaderInputs(publicCounter)")
-    $("#header"+publicCounter).append(addInput); 
-
-    $("#header"+publicCounter).append(" ");
-
-    var deleteInput = document.createElement("input"); 
-    deleteInput.id = "deleteHeader"+publicCounter;
-    deleteInput.type = "button";
-    deleteInput.value = "X";
-    deleteInput.setAttribute("style","display:none");
-    deleteInput.setAttribute("onClick","deleteInputs(this)");
-    $("#header"+publicCounter).append(deleteInput); 
 } 
 
 function addParticipantInput(counter){
-    $("#deleteParticipant"+counter).css("display", "inline");
 
-    if(participantCounter != counter)
-        participantCounter = counter;
-    participantCounter++;
+    if(!/^\w+@\w(\.|\w)*$/.test($("#jid_participant"+counter).val())){
+        alert("Participant Malformat ! Please use this format : word@word(.word)");
+    }else if($("#jid_participant"+counter).val()==""){
+        alert("You have to fill the blank before add a participant");
+    }else{
+        $("#deleteParticipant"+counter).css("display", "inline");
 
-    $("#participants_input input:#jid_participant"+counter).attr("disabled","disabled");
-    $("#participants_input input:#addParticipant"+counter).attr("disabled","disabled");
+        if(participantCounter != counter)
+            participantCounter = counter;
+        participantCounter++;
 
-    var new_div = jQuery ('<div id="participant'+participantCounter+'"></div>');
-    $("#participants_input").append(new_div);
+        $("#participants_input input:#jid_participant"+counter).attr("disabled","disabled");
+        $("#participants_input input:#addParticipant"+counter).attr("disabled","disabled");
 
-    var participantInput = document.createElement("input");
-    participantInput.id = "jid_participant"+participantCounter;  
-    participantInput.type = "text"; 
-    participantInput.size = 22; 
-    $("#participant"+participantCounter).append(participantInput);
-    
-    $("#participant"+participantCounter).append(" ");
+        var new_div = jQuery ('<div id="participant'+participantCounter+'"></div>');
+        $("#participants_input").append(new_div);
 
-    var addInput = document.createElement("input"); 
-    addInput.id = "addParticipant"+participantCounter;
-    addInput.type = "button";
-    addInput.value = "A";
-    addInput.setAttribute("onClick","addParticipantInput(participantCounter)")
-    $("#participant"+participantCounter).append(addInput); 
+        var participantInput = document.createElement("input");
+        participantInput.id = "jid_participant"+participantCounter;  
+        participantInput.type = "text"; 
+        participantInput.size = 22; 
+        $("#participant"+participantCounter).append(participantInput);
+        
+        $("#participant"+participantCounter).append(" ");
 
-    $("#participant"+participantCounter).append(" ");
+        var addInput = document.createElement("input"); 
+        addInput.id = "addParticipant"+participantCounter;
+        addInput.type = "button";
+        addInput.value = "A";
+        addInput.setAttribute("onClick","addParticipantInput(participantCounter)")
+        $("#participant"+participantCounter).append(addInput); 
 
-    var deleteInput = document.createElement("input"); 
-    deleteInput.id = "deleteParticipant"+participantCounter;
-    deleteInput.type = "button";
-    deleteInput.value = "X";
-    deleteInput.setAttribute("style","display:none");
-    deleteInput.setAttribute("onClick","deleteInputs(this)");
-    $("#participant"+participantCounter).append(deleteInput); 
+        $("#participant"+participantCounter).append(" ");
 
-    //Persist element into an object !!! TODO
-    participantsPersisted[counter] = $("#jid_participant"+counter).val();
+        var deleteInput = document.createElement("input"); 
+        deleteInput.id = "deleteParticipant"+participantCounter;
+        deleteInput.type = "button";
+        deleteInput.value = "X";
+        deleteInput.setAttribute("style","display:none");
+        deleteInput.setAttribute("onClick","deleteInputs(this)");
+        $("#participant"+participantCounter).append(deleteInput); 
+
+        //Persist element into an object
+        participantsPersisted[counter] = $("#jid_participant"+counter).val();
+    }
 }
 
 function deleteInputs(inputToDelete){
@@ -591,19 +580,19 @@ function hCallback(msg){
     else if (msg.type == 'hResult'){
         if(msg.data.reqid == idGetChann){
             var result = msg.data.result;
-
             for(var i =0; i < result.length; i++){
                 result[i].id = result[i].chid;
                 channels.add(result[i]);
             }
             console.log("All Channels retrieved !");
+            console.log(channels);
             listChannelView.setCollection(channels);
         }else{
             if(msg.data.status == 0){
                 $(document).trigger('createUpdate');
                 console.log("Channel created & persisted !");
             }else{
-                console.log("ERROR !!!" + msg.data.status)
+                console.log("ERROR n°: !!!" + msg.data.status)
             }
         }
     }
