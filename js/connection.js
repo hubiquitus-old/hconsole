@@ -19,9 +19,9 @@
 var extrasPersisted = {};
 var headersPersisted = {};
 var participantsPersisted = {};
-var participant
 var publicCounter = 0;
 var participantCounter = 0;
+var extraCounter = 0;
 var idRow = null;
 var currentOwner = null;
 var current = [];
@@ -523,9 +523,9 @@ function addExtraInputs(counter){
         $("#deleteExtra"+counter).css("display", "inline");
         
         //Update compteurs
-        if(publicCounter != counter)
-            publicCounter = counter;
-        publicCounter++;
+        if(extraCounter != counter)
+            extraCounter = counter;
+        extraCounter++;
 
         //Persist objets into a var
         extrasPersisted[counter] = {
@@ -538,44 +538,44 @@ function addExtraInputs(counter){
         $("#extra_value"+counter).attr("disabled","disabled");
         $("#addExtra"+counter).attr("disabled","disabled");
 
-        var new_div = jQuery ('<div id="extra'+publicCounter+'"></div>');
+        var new_div = jQuery ('<div id="extra'+extraCounter+'"></div>');
         $("#extra_inputs").append(new_div);
 
         //Add li balise 
-        $("#extra"+publicCounter).append('<li>');
+        $("#extra"+extraCounter).append('<li>');
 
         var extraNameInput = document.createElement("input"); 
         extraNameInput.type = "text";
-        extraNameInput.id = "extra_name"+publicCounter;  
+        extraNameInput.id = "extra_name"+extraCounter;  
         extraNameInput.size = 2; 
-        $("#extra" + publicCounter + " li").append(extraNameInput);
+        $("#extra" + extraCounter + " li").append(extraNameInput);
 
-        $("#extra" + publicCounter + " li").append(" ");
+        $("#extra" + extraCounter + " li").append(" ");
         
         var extraValueInput = document.createElement("input"); 
         extraValueInput.type = "text"; 
-        extraValueInput.id = "extra_value"+publicCounter;
+        extraValueInput.id = "extra_value"+extraCounter;
         extraValueInput.size = 2;  
-        $("#extra" + publicCounter + " li").append(extraValueInput);  
+        $("#extra" + extraCounter + " li").append(extraValueInput);  
 
-        $("#extra" + publicCounter + " li").append(" ");
+        $("#extra" + extraCounter + " li").append(" ");
 
         var addInput = document.createElement("input"); 
-        addInput.id = "addExtra"+publicCounter;
+        addInput.id = "addExtra"+extraCounter;
         addInput.type = "button";
         addInput.value = "A";
-        addInput.setAttribute("onClick","addExtraInputs(publicCounter)")
-        $("#extra" + publicCounter + " li").append(addInput); 
+        addInput.setAttribute("onClick","addExtraInputs(extraCounter)")
+        $("#extra" + extraCounter + " li").append(addInput); 
 
-        $("#extra" + publicCounter + " li").append(" ");
+        $("#extra" + extraCounter + " li").append(" ");
 
         var deleteInput = document.createElement("input"); 
-        deleteInput.id = "deleteExtra"+publicCounter;
+        deleteInput.id = "deleteExtra"+extraCounter;
         deleteInput.type = "button";
         deleteInput.value = "X";
         deleteInput.setAttribute("style","display:none");
         deleteInput.setAttribute("onClick","deleteInputs(this)");
-        $("#extra" + publicCounter + " li").append(deleteInput); 
+        $("#extra" + extraCounter + " li").append(deleteInput); 
     } 
 }
 
