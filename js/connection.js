@@ -55,7 +55,8 @@ var error = '';
 var idGetChann = null;
 var idCreateUpdateChann = null;
 
-var homeView,
+var connectionView,
+    homeView,
     listChannelView,
     editChannelView,
     createChannelView;
@@ -64,12 +65,25 @@ var hOptions = {
     serverHost: "",
     serverPort: "",
     transport: "",
+    // endpoints: ["http://192.168.2.104:5280/http-bind"] BOSH
+    // endpoints: ["http://hub.novediagroup.com:5280/http-bind"]
     endpoints: ["http://"]
+    // endpoints: ["http://192.168.2.100:8080/"] 
 };
 
 setTimeout(function(){
     hClient.connect("user","password",hCallback,hOptions);
+    // hClient.connect("u1@localhost","u1",hCallback,hOptions);
 },3000);
+
+/*function initApp(){
+    console.log('initApp',hClient);
+    hClient.connect("u1@hub.novediagroup.com","u1",hCallback,hOptions);
+}*/
+
+function connection(user,password){
+    hClient.connect(user,password,hCallback,hOptions);
+}
 
 function getChannels(){
     var commandGetChann = {
@@ -170,12 +184,14 @@ function populateForm(channelToEdit){
     }
 
     //Populate extra fileds
-    for(var i = 0; i < channelToEdit.location.extras.length; i++){
-        if(i==(channelToEdit.location.extras.length-1))
-        {
-            extraPopulateForm(channelToEdit.location.extras[i].name, channelToEdit.location.extras[i].value, i+1,true);
-        }else{
-            extraPopulateForm(channelToEdit.location.extras[i].name, channelToEdit.location.extras[i].value, i+1,false);
+    if(channelToEdit.location != ""){
+        for(var i = 0; i < channelToEdit.location.extras.length; i++){
+            if(i==(channelToEdit.location.extras.length-1))
+            {
+                extraPopulateForm(channelToEdit.location.extras[i].name, channelToEdit.location.extras[i].value, i+1,true);
+            }else{
+                extraPopulateForm(channelToEdit.location.extras[i].name, channelToEdit.location.extras[i].value, i+1,false);
+            }
         }
     }
 

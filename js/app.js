@@ -3,16 +3,15 @@
 (function($){
     launcher = Backbone.Router.extend({
         routes : {
-            //""                      :"connection",
-            ""                      : "home",
+            ""                      : "connection",
+            "home"                  : "home",
             "channel/list"          : "listChannel",
             "channel/create"        : "createChannel",
             "channel/edit/:id"      : "editChannel"
         },
         initialize : function(){
             console.log("Backbone is launched !");
-            //$("#userConnected").append("Welcome "+hClient.publisher);
-            //$("#userConnected").append("<input type='button' id='disconnect' value='Disconnect' onClick='disconnect()'/>");
+            
             connectionView = new viewConnection({el:"#content"});
             homeView = new viewHomeConsole({el:"#content"});
             listChannelView = new viewListChannel({el:"#tabContent"});

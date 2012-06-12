@@ -20,6 +20,8 @@
         },
         connection: function(){
             homeView.render();
+            $("#userConnected").append("Welcome "+hClient.publisher);
+            $("#userConnected").append("<input type='button' id='disconnect' value='Disconnect' onClick='disconnect()'/>");
             console.log("You are logged !");
             return this;  
         }
@@ -43,7 +45,7 @@
             return this;
         },
         homePage: function(){
-            router.navigate("", {trigger: true});
+            router.navigate("home", {trigger: true});
             console.log("home page");
             return this;  
         },
