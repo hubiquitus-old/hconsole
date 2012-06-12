@@ -1,30 +1,43 @@
-var listChannelView,
-    editChannelView,
-    createChannelView;
+
 
 (function($){
     launcher = Backbone.Router.extend({
         routes : {
-            ""                      : "listChannel",
+            //""                      :"connection",
+            ""                      : "home",
+            "channel/list"          : "listChannel",
             "channel/create"        : "createChannel",
             "channel/edit/:id"      : "editChannel"
         },
         initialize : function(){
-            console.log("Backbone is launch !");
-            listChannelView = new viewListChannel({el:"#channel_content"});
-            editChannelView = new viewEditChannel({el:"#channel_content"});
-            createChannelView = new viewCreateChannel({el:"#channel_content"});
+            console.log("Backbone is launched !");
+            //$("#userConnected").append("Welcome "+hClient.publisher);
+            //$("#userConnected").append("<input type='button' id='disconnect' value='Disconnect' onClick='disconnect()'/>");
+            connectionView = new viewConnection({el:"#content"});
+            homeView = new viewHomeConsole({el:"#content"});
+            listChannelView = new viewListChannel({el:"#tabContent"});
+            editChannelView = new viewEditChannel({el:"#tabContent"});
+            createChannelView = new viewCreateChannel({el:"#tabContent"});
+        },
+        connection: function(){
+            connectionView.render();
+        },
+        home : function(){
+            cleanRequestState();
+            homeView.render();
         },
         listChannel : function(){
             listChannelView.render();
         },
         createChannel : function(){
+            cleanRequestState();
             createChannelView.render();
             $("#modify").css("display","none");
 
             $("#tr_owner td input").attr("value",currentOwner);
         },
         editChannel : function(){
+            cleanRequestState();
             editChannelView.render();
             $("#create").css("display", "none");
 

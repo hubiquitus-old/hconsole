@@ -55,19 +55,20 @@ var error = '';
 var idGetChann = null;
 var idCreateUpdateChann = null;
 
+var homeView,
+    listChannelView,
+    editChannelView,
+    createChannelView;
+
 var hOptions = {
-    serverHost: "localhost",
+    serverHost: "",
     serverPort: "",
-    transport: "socketio",
-    // endpoints: ["http://192.168.2.104:5280/http-bind"] BOSH
-    // endpoints: ["http://hub.novediagroup.com:5280/http-bind"]
-    endpoints: ["http://hub.novediagroup.com:8080/"]
-    // endpoints: ["http://192.168.2.100:8080/"] 
+    transport: "",
+    endpoints: ["http://"]
 };
 
 setTimeout(function(){
-    hClient.connect("u1@hub.novediagroup.com","u1",hCallback,hOptions);
-    // hClient.connect("u1@localhost","u1",hCallback,hOptions);
+    hClient.connect("user","password",hCallback,hOptions);
 },3000);
 
 function getChannels(){
@@ -668,6 +669,22 @@ function editCollection(newChan){
     channels.get(newChan.id).attributes = newChan;
 }
 
+function disconnect(){
+    hClient.disconnect();
+}
+
+function requestInProgress(command){
+    $("#requete").html(command + " in progress...");
+}
+
+function responseReceived(command){
+    $("#requete").html(command + " received !");
+}
+
+function cleanRequestState(){
+    $("#requete").html("No request !");
+}
+
 function hCallback(msg){
    // console.log(JSON.stringify(msg));
     if(msg.type == 'hStatus'){
@@ -675,9 +692,7 @@ function hCallback(msg){
             case hClient.status.CONNECTED:
                 status = 'Connected';
                 $(document).trigger('connected');
-                getChannels();
                 currentOwner = hClient.publisher;
-
                 break;
             case hClient.status.CONNECTING:
                 status = 'Connecting';
@@ -688,7 +703,6 @@ function hCallback(msg){
             case hClient.status.REATTACHED:
                 status = 'Reattached';
                 $(document).trigger('reattached');
-                getChannels();
                 currentOwner = hClient.publisher;
                 break;
             case hClient.status.DISCONNECTING:
@@ -771,11 +785,13 @@ function hCallback(msg){
                 result[i].id = result[i].chid;
                 channels.add(result[i]);
             }
+            responseReceived("getChannels");
             console.log("All Channels retrieved !");
             console.log(channels);
             listChannelView.setCollection(channels);
         }else{
             if(msg.data.status == 0){
+                responseReceived("createUpdate");
                 $(document).trigger('createUpdate');
                 console.log("Channel created & persisted !");
             }else{

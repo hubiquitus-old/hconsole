@@ -9,8 +9,7 @@
         <script type="text/javascript" charset="utf-8" src="libs/underscore-min.js"></script>
         <script type="text/javascript" charset="utf-8" src="libs/backbone.js"></script>
         <script type="text/javascript" charset="utf-8" src="libs/hubiquitusjs/lib/transports/socketio/socket.io.js"></script>
-        <script data-main="libs/hubiquitusjs/hubiquitus.js" src='libs/hubiquitusjs/lib/require.js'></script>
-        
+        <script data-main="libs/hubiquitusjs/hubiquitus" src='libs/hubiquitusjs/lib/require.js'></script>
         <script type="text/javascript" charset="utf-8" src="js/app.models.js"></script>
         <script type="text/javascript" charset="utf-8" src="js/connection.js"></script>
         <script type="text/javascript" charset="utf-8" src="js/app.views.js"></script>
@@ -18,15 +17,38 @@
     </head>
 
     <body>
-        <div id="channels">
+        <div id="hConsole">
             <header>
-                <h1>Channel administration</h1>
+                <h1>Console hubiquitus</h1>
+                <span id="userConnected"></span>
+                <span id="requete"></span>
                 <span id="status"></span> 
             </header>
-            <div id="channel_content"></div>
+            <div id="content">
+            </div>
         </div>
     </body>
-
+    <script type="text/template" id="template-connection">
+        <form>
+            <fieldset>
+            <legend align=top> Connection </LEGEND>
+            User : <INPUT name="user" type="text"/>
+            Password : <INPUT name="Passwordd" type="text"/>
+            <INPUT type="button" id="connection" value="Connection"/>
+            </FIELDSET>
+        </form>
+    </script>  
+    <script type="text/template" id="template-hConsole">
+        <div id="menu">
+            <ul id="tabs">
+                <li id="homeTab" class="active"> Accueil </li>
+                <li id="channelTab"> Channel </li>
+            </ul>
+        </div>
+        <div id="tabContent">
+            HOME !
+        </div>
+    </script>
     <script type="text/template" id="template-channelListPage">
         <section id="list">
             <h2>List of channels</h2>

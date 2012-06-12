@@ -1,6 +1,61 @@
 (function($){
 
 /*=================================================================*\
+    VIEW : Connection page 
+\*=================================================================*/
+    viewConnection = Backbone.View.extend({
+        events:{
+            "click #connection"         :"connection"
+        },
+
+        initialize: function(){
+            console.log("Connection");
+            this.template = _.template($("#template-connection").html());
+            _.bindAll(this,"render");
+        },
+        render: function(){
+            $(this.el).empty();
+            $(this.el).append(this.template);
+            return this;
+        },
+        connection: function(){
+            homeView.render();
+            console.log("You are logged !");
+            return this;  
+        }
+    });
+/*=================================================================*\
+    VIEW : Home 
+\*=================================================================*/
+    viewHomeConsole = Backbone.View.extend({
+        events:{
+            "click #homeTab"            : "homePage",
+            "click #channelTab "        : "channelPage"
+        },
+
+        initialize: function(){
+            this.template = _.template($("#template-hConsole").html());
+            _.bindAll(this,"render");
+        },
+        render: function(){
+            $(this.el).empty();
+            $(this.el).append(this.template);
+            return this;
+        },
+        homePage: function(){
+            router.navigate("", {trigger: true});
+            console.log("home page");
+            return this;  
+        },
+        channelPage: function(){
+            requestInProgress("getChannels");
+            getChannels();
+            router.navigate("channel/list", {trigger: true});
+            console.log("channel page");
+            return this;
+        }
+    });
+/*=================================================================*\
     VIEW : List of channels
 \*=================================================================*/
     viewListChannel = Backbone.View.extend({
@@ -26,6 +81,7 @@
             console.log("List initialized");
         },
         render: function(){
+            this.setElement($("#tabContent"));
             $(this.el).empty();
             $(this.el).append(this.template ({"current": this.collection.models}));
             // console.log("Render called!");
@@ -48,7 +104,7 @@
         },
 
         cancel: function(){
-            router.navigate("", {trigger: true});
+            router.navigate("channel/list", {trigger: true});
             return this;
         },
         createChannel: function(){
@@ -71,10 +127,11 @@
             if(minimumRaised==true){  
                 channels.add(channelToCreate);
 
+                requestInProgress("createUpdateChannel");
                 createUpdateChannel(channelToCreate);
                 
                 $(document).bind('createUpdate', function () {
-                    router.navigate("", {trigger: true});
+                    router.navigate("channel/list", {trigger: true});
                 });
                 minimumRaised = false;
                 return this;
@@ -85,9 +142,9 @@
         initialize: function(){
             this.template = _.template($('#template-channelFormPage').html());
             _.bindAll(this,"render");
-            // console.log("Form (to create) initialized");
         },
         render: function(){
+            this.setElement($("#tabContent"));
             $(this.el).empty();
             $(this.el).append(this.template);
             return this;
@@ -104,7 +161,7 @@
         },
 
         cancel: function(){
-            router.navigate("", {trigger: true});
+            router.navigate("channel/list", {trigger: true});
             return this;
         },
         editChannel: function(){
@@ -128,9 +185,11 @@
 
             if(minimumRaised == true){ 
                 editCollection(channRecup.attributes);
+                
+                requestInProgress("createUpdateChannel");
                 createUpdateChannel(channRecup);
                 $(document).bind('createUpdate', function () {
-                    router.navigate("", {trigger: true});
+                    router.navigate("channel/list", {trigger: true});
                 });
                 minimumRaised = false;
                 return this;
@@ -141,9 +200,9 @@
         initialize: function(){
             this.template = _.template($('#template-channelFormPage').html());
             _.bindAll(this,"render");
-            // console.log("Form (to edit) initialized");
         },
         render: function(){
+            this.setElement($("#tabContent"));
             $(this.el).empty();
             $(this.el).append(this.template);
             return this;
