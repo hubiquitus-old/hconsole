@@ -64,16 +64,6 @@ var connectionView,
     editChannelView,
     createChannelView;
 
-// var hOptions = {
-//     serverHost: "localhost",
-//     serverPort: "",
-//     transport: "socketio",
-//     //endpoints: ["http://192.168.2.104:5280/http-bind"] BOSH
-//     //endpoints: ["http://hub.novediagroup.com:5280/http-bind"]
-//     endpoints: ["http://hub.novediagroup.com:8080/"]
-//     //endpoints: ["http://192.168.2.100:8080/"] 
-// };
-
 var hOptions = {
     serverHost: "",
     serverPort: "",
