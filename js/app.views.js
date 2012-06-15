@@ -19,28 +19,45 @@
             return this;
         },
         connection: function(){
-            var connected = false;
             disconnect();
+            
+            // fill options connection
+            hOptions.serverHost = $("#serverHost").val();
+            hOptions.serverPort = $("#serverPort").val();
+            hOptions.endpoints[0] = $("#endpoints").val();
+
             currentUser = $("#user").val();
             userPassword = $("#password").val();
-            connection(currentUser,userPassword);
 
-            $(document).bind('connected', function () {
-                router.navigate("home", {trigger: true});
-                $("#userConnected").html("Welcome "+ currentUser);
-                $("#userConnected").append(" <input type='button' id='disconnect' value='Disconnect' onClick='disconnect()'/>");
-                console.log("You are logged !");
-            });
-
-            $(".alert").empty();
-            if(currentUser == "" || userPassword == ""){
-                $(".alert").html("You have to fill all blanks to be connected");
-            }else if(!/^\w+@\w(\.|\w)*$/.test(currentUser)){
-                $(".alert").html("User Malformat ! Please use this format : word@word");
+            if(hOptions.endpoints[0] == ""){
+                $(".alert").html("You have to fill the endpoint field, to be connected");
             }else{
-                setTimeout(function(){
-                    $(".alert").html("Your id or password is not good ");
-                },4000);   
+                connection(currentUser,userPassword);
+
+                $(document).bind('connected', function () {
+                    router.navigate("home", {trigger: true});
+                    $("#userConnected").html("Welcome "+ currentUser);
+                    $("#userConnected").append(" <input type='button' id='disconnect' value='Disconnect' onClick='disconnect()'/>");
+                    console.log("You are logged !");
+                });
+                //path ! Should exist !
+                $(document).bind('reattached', function () {
+                    router.navigate("home", {trigger: true});
+                    $("#userConnected").html("Welcome "+ currentUser);
+                    $("#userConnected").append(" <input type='button' id='disconnect' value='Disconnect' onClick='disconnect()'/>");
+                    console.log("You are logged !");
+                });
+
+                $(".alert").empty();
+                if(currentUser == "" || userPassword == ""){
+                    $(".alert").html("You have to fill all blanks to be connected");
+                }else if(!/^\w+@\w(\.|\w)*$/.test(currentUser)){
+                    $(".alert").html("User Malformat ! Please use this format : word@word");
+                }else{
+                    setTimeout(function(){
+                        $(".alert").html("One or several fields is wrong, please verify and try again");
+                    },4000);   
+                }
             }
 
             return this;  
@@ -65,10 +82,16 @@
             return this;
         },
         homePage: function(){
+            $("#channelTab").removeClass();
+            $("#homeTab").addClass("active");
+            
             router.navigate("home", {trigger: true});
             return this;  
         },
         channelPage: function(){
+            $("#homeTab").removeClass();
+            $("#channelTab").addClass("active");
+            
             requestInProgress("getChannels");
             getChannels();
             router.navigate("channel/list", {trigger: true});

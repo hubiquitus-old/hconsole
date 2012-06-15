@@ -64,13 +64,22 @@ var connectionView,
     editChannelView,
     createChannelView;
 
+// var hOptions = {
+//     serverHost: "localhost",
+//     serverPort: "",
+//     transport: "socketio",
+//     //endpoints: ["http://192.168.2.104:5280/http-bind"] BOSH
+//     //endpoints: ["http://hub.novediagroup.com:5280/http-bind"]
+//     endpoints: ["http://hub.novediagroup.com:8080/"]
+//     //endpoints: ["http://192.168.2.100:8080/"] 
+// };
+
 var hOptions = {
     serverHost: "",
     serverPort: "",
     transport: "",
-    endpoints: ["http://"]
+    endpoints: [""]
 };
-
 
 function connection(user,password){
     hClient.connect(user,password,hCallback,hOptions);
@@ -156,13 +165,17 @@ function conversePriorityToString(priority){
     }
 }
 
-function testRadio(radio){
+function retrieveRadio(radio){
     for (var i=0; i<radio.length;i++) {
         if (radio[i].checked) {
-            activeRetrived = radio[i].value;
+            var radioRetrieved = radio[i].value;
         }
     }
-    activeRetrived = activeRetrived == "true" ? true : false;
+    if(radioRetrieved == "true" || radioRetrieved == "false"){
+        activeRetrived = radioRetrieved == "true" ? true : false;
+    }else if(radioRetrieved == "bosh" || radioRetrieved == "socketio"){
+        hOptions.transport = radioRetrieved == "bosh" ? "bosh" : "socketio";
+    } 
 }
 
 function populateForm(channelToEdit){
@@ -744,7 +757,6 @@ function cleanRequestState(){
 }
 
 function hCallback(msg){
-   // console.log(JSON.stringify(msg));
     if(msg.type == 'hStatus'){
         switch(msg.data.status){
             case hClient.status.CONNECTED:
@@ -852,8 +864,8 @@ function hCallback(msg){
                 $(document).trigger('createUpdate');
                 console.log("Channel created & persisted !");
             }else{
-                console.log("ERROR n°: !!!" + msg.data.status);
-                console.log(msg.data.result);
+                console.log("ERROR n°: " + msg.data.status);
+                console.log("ERROR Type : ", msg.data.result);
             }
         }
     }

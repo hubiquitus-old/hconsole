@@ -29,14 +29,35 @@
         </div>
     </body>
     <script type="text/template" id="template-connection">
-        <form>
+        <form id="connectionForm">
             <span class="alert"></span>
             <fieldset>
-            <legend align=top> Connection </LEGEND>
-            User : <INPUT id="user" type="text"/>
-            Password : <INPUT id="password" type="text"/>
-            <INPUT type="button" id="connection" value="Connection"/>
-            </FIELDSET>
+                <legend align=top> Connection </legend>
+                <p class="double">
+                    <label>User<span id="star"> *</span> : <span class="info">(Format: user@domain)</span></label>
+                    <input id="user" type="text"/><br/>
+                </p>
+                <p class="double"> 
+                    <label>Password<span id="star"> *</span> :</label><input id="password" type="text"/><br/>
+                </p>
+                <p class="double"> 
+                    <label>XMPP Server Host :</label><input id="serverHost" type="text"/><br/>
+                </p>
+                <p class="double"> 
+                    <label>XMPP Server Port :</label><input id="serverPort" type="text"/><br/>
+                </p>
+                <p class="double"> 
+                    <label>Transport<span id="star"> *</span> : </label>
+                    <span>&nbsp; &nbsp; Bosh</span> <input type=radio name="transport" value="bosh"/>
+                    <span>&nbsp; &nbsp; &nbsp; Socketio</span> <input type=radio name="transport" value="socketio" checked="checked"/>
+                </p>
+                <p class="double"> 
+                    <label>Endpoint<span id="star"> *</span> :<span class="info">(Format: 'http://host:port/namespace')</span></label><input id="endpoints" type="text"/><br/>
+                </p>
+                <p class="simple">
+                    <input type="button" id="connection" value="Connection" onClick="retrieveRadio(this.form.transport)"/>
+                </p>
+            </fielset>
         </form>
     </script>  
     <script type="text/template" id="template-hConsole">
@@ -170,8 +191,8 @@
                 </td>
             </tr>
             </table><br/>
-            <input id="create" type="button" value="Create" onClick="testRadio(this.form.active)"/>
-            <input id="modify" type="button" value="Save" onClick="testRadio(this.form.active)"/>
+            <input id="create" type="button" value="Create" onClick="retrieveRadio(this.form.active)"/>
+            <input id="modify" type="button" value="Save" onClick="retrieveRadio(this.form.active)"/>
             <input id="cancel" type="button" value="Cancel"/>
         </form>
     </script>
