@@ -19,10 +19,30 @@
             return this;
         },
         connection: function(){
-            homeView.render();
-            $("#userConnected").append("Welcome "+hClient.publisher);
-            $("#userConnected").append("<input type='button' id='disconnect' value='Disconnect' onClick='disconnect()'/>");
-            console.log("You are logged !");
+            var connected = false;
+            disconnect();
+            currentUser = $("#user").val();
+            userPassword = $("#password").val();
+            connection(currentUser,userPassword);
+
+            $(document).bind('connected', function () {
+                router.navigate("home", {trigger: true});
+                $("#userConnected").html("Welcome "+ currentUser);
+                $("#userConnected").append(" <input type='button' id='disconnect' value='Disconnect' onClick='disconnect()'/>");
+                console.log("You are logged !");
+            });
+
+            $(".alert").empty();
+            if(currentUser == "" || userPassword == ""){
+                $(".alert").html("You have to fill all blanks to be connected");
+            }else if(!/^\w+@\w(\.|\w)*$/.test(currentUser)){
+                $(".alert").html("User Malformat ! Please use this format : word@word");
+            }else{
+                setTimeout(function(){
+                    $(".alert").html("Your id or password is not good ");
+                },4000);   
+            }
+
             return this;  
         }
     });
@@ -46,14 +66,12 @@
         },
         homePage: function(){
             router.navigate("home", {trigger: true});
-            console.log("home page");
             return this;  
         },
         channelPage: function(){
             requestInProgress("getChannels");
             getChannels();
             router.navigate("channel/list", {trigger: true});
-            console.log("channel page");
             return this;
         }
     });
@@ -80,7 +98,7 @@
             this.collection = channels;
             _.bindAll(this,"render");
 
-            console.log("List initialized");
+            //console.log("List initialized");
         },
         render: function(){
             this.setElement($("#tabContent"));
@@ -91,7 +109,7 @@
         },
         setCollection: function(_collection){
             this.collection = _collection;
-            console.log("Collection set !");
+            //console.log("Collection set !");
             this.render();
         }
     });
@@ -110,35 +128,67 @@
             return this;
         },
         createChannel: function(){
-            retrieveForm();
-
-            var channelToCreate = new Channel();
-            channelToCreate.set({
-                id : idRetrived,
-                chid : idRetrived,
-                chdesc : descRetrived,
-                priority : priorityConverted,
-                location : locationBuilt,
-                host : hostRetrived,
-                owner : ownerRetrived,
-                participants : participantBuilt,
-                active : activeRetrived,
-                headers : headerBuilt
-            });
-
-            if(minimumRaised==true){  
-                channels.add(channelToCreate);
-
-                requestInProgress("createUpdateChannel");
-                createUpdateChannel(channelToCreate);
-                
-                $(document).bind('createUpdate', function () {
-                    router.navigate("channel/list", {trigger: true});
-                });
-                minimumRaised = false;
-                return this;
+            var alreadyExists = false;
+            for(var i = 0; i < channels.length; i++){
+                if(channels.get(document.getElementById("chid").value))
+                    alreadyExists = true;
+            }
+            //Check if id already exist or is equals to a reserved keyword before registered it
+            if(alreadyExists == true){
+                $(".alert").html("Your id already exist, please choose another one");
+            }else if(/(system\.indexes|^h)/.test(document.getElementById("chid").value)){
+                $(".alert").html("Your id is a reserved keyword, please change");
             }else{
-                 $(".alert").html("You have to fill all required fields");
+                retrieveForm();
+
+                var channelToCreate = new Channel();
+                channelToCreate.set({
+                    id : idRetrived,
+                    chid : idRetrived,
+                    chdesc : descRetrived,
+                    priority : priorityConverted,
+                    location : locationBuilt,
+                    host : hostRetrived,
+                    owner : ownerRetrived,
+                    participants : participantBuilt,
+                    active : activeRetrived,
+                    headers : headerBuilt
+                });
+
+                channelToCreate = channelToCreate.attributes;
+
+                if(channelToCreate.chdesc == ""){
+                    console.log("suppression desc");
+                    delete channelToCreate.chdesc;
+                }
+                if(channelToCreate.priority == 6){
+                    console.log("suppression priority");
+                    delete channelToCreate.priority;
+                }
+                /*if(_.isEmpty(channelToCreate.location)){
+                    console.log("suppression location");
+                    delete channelToCreate.location;
+                }
+                if(channelToCreate.headers instanceof Array && channelToCreate.headers.length == 0){
+                    console.log("suppression headers");
+                    delete channelToCreate.headers;
+                }*/
+
+                //console.log("A envoyer au serveur :", channelToCreate);
+                if(minimumRaised==true){  
+                    channels.add(channelToCreate);
+
+                    requestInProgress("createUpdateChannel");
+                    createUpdateChannel(channelToCreate);
+                    
+                    $(document).bind('createUpdate', function () {
+                        router.navigate("channel/list", {trigger: true});
+                    });
+                    minimumRaised = false;
+                    return this;
+                }else{
+                     $(".alert").html("You have to fill all required fields");
+                }
             }
         },
         initialize: function(){
@@ -182,11 +232,32 @@
                 active : activeRetrived,
                 headers : headerBuilt
             });
-            console.log("ChannRecupéré du formulaire avant édition finale :");
-            console.log(channRecup);
+
+            channRecup = channRecup.attributes;
+
+            if(channRecup.chdesc == ""){
+                console.log("suppression desc");
+                delete channRecup.chdesc;
+            }
+            if(channRecup.priority == 6){
+                console.log("suppression priority");
+                delete channRecup.priority;
+            }
+            /*if(_.isEmpty(channRecup.location)){
+                console.log("suppression location");
+                delete channRecup.location;
+            }
+            if(channRecup.headers instanceof Array && channRecup.headers.length == 0){
+                console.log("suppression headers");
+                delete channRecup.headers;
+            }*/
+
+            //console.log("ChannRecupéré du formulaire avant édition finale : ", channRecup);
 
             if(minimumRaised == true){ 
-                editCollection(channRecup.attributes);
+                console.log("Channels :",channels);
+
+                editCollection(channRecup);
                 
                 requestInProgress("createUpdateChannel");
                 createUpdateChannel(channRecup);

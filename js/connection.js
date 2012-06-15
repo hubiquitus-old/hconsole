@@ -33,7 +33,7 @@ var idRetrived = null;
 var descRetrived = null;
 var priorityRetrived = null;
 var priorityConverted = null; 
-var locationBuilt = null;
+var locationBuilt = {};
 var longRetrived = null;
 var latRetrived = null;
 var addressRetrieved = null;
@@ -55,6 +55,9 @@ var error = '';
 var idGetChann = null;
 var idCreateUpdateChann = null;
 
+var currentUser = null;
+var userPassword = null;
+
 var connectionView,
     homeView,
     listChannelView,
@@ -65,24 +68,19 @@ var hOptions = {
     serverHost: "",
     serverPort: "",
     transport: "",
-    // endpoints: ["http://192.168.2.104:5280/http-bind"] BOSH
-    // endpoints: ["http://hub.novediagroup.com:5280/http-bind"]
     endpoints: ["http://"]
-    // endpoints: ["http://192.168.2.100:8080/"] 
 };
 
-setTimeout(function(){
-    hClient.connect("user","password",hCallback,hOptions);
-    // hClient.connect("u1@localhost","u1",hCallback,hOptions);
-},3000);
-
-/*function initApp(){
-    console.log('initApp',hClient);
-    hClient.connect("u1@hub.novediagroup.com","u1",hCallback,hOptions);
-}*/
 
 function connection(user,password){
     hClient.connect(user,password,hCallback,hOptions);
+}
+
+function disconnect(){
+    hClient.disconnect();
+    router.navigate("", {trigger: true});
+    $("#requete").empty();
+    $("#userConnected").empty();
 }
 
 function getChannels(){
@@ -96,6 +94,7 @@ function getChannels(){
 }
 
 function createUpdateChannel(theChannel){
+    console.log("createUpdateChannel :", theChannel);
     var commandCreateUpdateChann = {
         entity : 'hnode.' + hClient.domain,
         cmd : 'hcreateupdatechannel',
@@ -107,6 +106,9 @@ function createUpdateChannel(theChannel){
 
 function conversePriorityToCode(priority){
     switch(priority){
+        case "notDefined" :
+            return 6;
+            break;
         case "trace" :
             return 0;
             break;
@@ -147,7 +149,10 @@ function conversePriorityToString(priority){
             break; 
         case 5 :
             return "panic";
-            break;    
+            break;  
+        case 6 :
+            return "notDefined";
+            break;  
     }
 }
 
@@ -161,93 +166,116 @@ function testRadio(radio){
 }
 
 function populateForm(channelToEdit){
-    console.log("Le formulaire va etre rempli avec l'objet suivant :");
-    console.log(channelToEdit);
+    console.log("Le formulaire va etre rempli avec l'objet suivant :", channelToEdit);
 
+    //Chid
     var id = channelToEdit.chid;
+    $("#tr_id td input").attr("value", id);
+    $("#tr_id td input").attr("disabled", "disabled");
+    
+    //Description
     var desc = channelToEdit.chdesc;
-    var priority = conversePriorityToString(channelToEdit.priority); 
-    var lng = "";
-    var lat = "";
-    var addr = "";
-    var zip = "";
-    var city = "";
-    var country = "";
+    $("#tr_desc td textarea").attr("value", desc);
 
-    if(channelToEdit.location!="undefined"){
-        lng = channelToEdit.location.lng;
-        lat = channelToEdit.location.lat;
-        addr = channelToEdit.location.addr;
-        zip = channelToEdit.location.zip;
-        city = channelToEdit.location.city;
-        country = channelToEdit.location.country;
+    //Priority
+    if(conversePriorityToString(channelToEdit.priority) != "notDefined"){
+        var priority = conversePriorityToString(channelToEdit.priority);
+        
+        for(var i =0; i<document.getElementsByTagName("option").length; i++){
+            if(document.getElementsByTagName("option")[i].value == priority){
+                document.getElementsByTagName("option")[i].setAttribute("selected", true);
+            }
+        } 
     }
 
-    //Populate extra fileds
-    if(channelToEdit.location != ""){
-        for(var i = 0; i < channelToEdit.location.extras.length; i++){
-            if(i==(channelToEdit.location.extras.length-1))
-            {
-                extraPopulateForm(channelToEdit.location.extras[i].name, channelToEdit.location.extras[i].value, i+1,true);
-            }else{
-                extraPopulateForm(channelToEdit.location.extras[i].name, channelToEdit.location.extras[i].value, i+1,false);
+    //Location 
+    if(channelToEdit.location != undefined){
+        if(channelToEdit.location.lng){
+            var lng = channelToEdit.location.lng;
+            $("#tr_location td input#longitude").attr("value", lng);
+        }
+        if(channelToEdit.location.lat){
+            var lat = channelToEdit.location.lat;
+            $("#tr_location td input#latitude").attr("value", lat);
+        }
+        
+        if(channelToEdit.location.addr){
+            var addr = channelToEdit.location.addr;
+            $("#tr_location td input#addr").attr("value", addr);
+        }
+
+        if(channelToEdit.location.zip){
+            var zip = channelToEdit.location.zip;
+            $("#tr_location td input#zip").attr("value", zip);
+        }
+
+        if(channelToEdit.location.city){
+            var city = channelToEdit.location.city;
+            $("#tr_location td input#city").attr("value", city);
+        }
+        
+        if(channelToEdit.location.country){
+            var country = channelToEdit.location.country;
+            $("#tr_location td input#country").attr("value", country);
+        }
+
+        //Populate extra fileds
+        if(channelToEdit.location.extras != undefined){
+            for(var i = 0; i < channelToEdit.location.extras.length; i++){
+                if(i==(channelToEdit.location.extras.length-1))
+                {
+                    extraPopulateForm(channelToEdit.location.extras[i].name, channelToEdit.location.extras[i].value, i+1,true);
+                }else{
+                    extraPopulateForm(channelToEdit.location.extras[i].name, channelToEdit.location.extras[i].value, i+1,false);
+                }
             }
         }
     }
 
+    //Host
     var host = channelToEdit.host;
-    var owner = channelToEdit.owner;
-
-    //Populate participant fileds
-    for(var i = 0; i< channelToEdit.participants.length; i++){
-        if(i==(channelToEdit.participants.length-1)){
-            participantPopulateForm(channelToEdit.participants[i], i+1, true);
-        }else{
-            participantPopulateForm(channelToEdit.participants[i], i+1, false);
-        }    
-    }
-
-    var active = channelToEdit.active;
-
-    //Populate header fileds
-    for(var i = 0; i < channelToEdit.headers.length; i++){
-        if(i==(channelToEdit.headers.length-1))
-        {
-            headerPopulateForm(channelToEdit.headers[i].hKey, channelToEdit.headers[i].hValue, i+1,true);
-        }else{
-            headerPopulateForm(channelToEdit.headers[i].hKey, channelToEdit.headers[i].hValue, i+1,false);
-        }
-    }
-
-    $("#tr_id td input").attr("value", id);
-    $("#tr_id td input").attr("disabled", "disabled");
-
     $("#tr_host td input").attr("value", host);
     $("#tr_host td input").attr("disabled", "disabled");
 
+    //Owner
+    var owner = channelToEdit.owner;
     $("#tr_owner td input").attr("value", owner);
     $("#tr_owner td input").attr("disabled", "disabled");
 
-    $("#tr_desc td textarea").attr("value", desc);
-
-    for(var i =0; i<document.getElementsByTagName("option").length; i++){
-        if(document.getElementsByTagName("option")[i].value == priority){
-            document.getElementsByTagName("option")[i].setAttribute("selected", true);
+    //Populate participant fileds
+    if(channelToEdit.participants != undefined){
+        if(channelToEdit.participants.length != 0){
+            for(var i = 0; i< channelToEdit.participants.length; i++){
+                if(i==(channelToEdit.participants.length-1)){
+                    participantPopulateForm(channelToEdit.participants[i], i+1, true);
+                }else{
+                    participantPopulateForm(channelToEdit.participants[i], i+1, false);
+                }    
+            }
         }
     }
 
-    $("#tr_location td input#longitude").attr("value", lng);
-    $("#tr_location td input#latitude").attr("value", lat);
-    $("#tr_location td input#addr").attr("value", addr);
-    $("#tr_location td input#zip").attr("value", zip);
-    $("#tr_location td input#city").attr("value", city);
-    $("#tr_location td input#country").attr("value", country);
-    
+    //Active
+    var active = channelToEdit.active;
     for(var i =0; i<document.getElementById("tr_active").getElementsByTagName("input").length; i++){
         if(document.getElementById("tr_active").getElementsByTagName("input")[i].value == ''+active){
             document.getElementById("tr_active").getElementsByTagName("input")[i].setAttribute("checked", "checked");
         }
-    }   
+    } 
+
+    //Populate header fields
+    if(channelToEdit.headers != undefined){
+        if(channelToEdit.headers.length != 0){
+            for(var i = 0; i < channelToEdit.headers.length; i++){
+                if(i==(channelToEdit.headers.length-1))
+                {
+                    headerPopulateForm(channelToEdit.headers[i].hKey, channelToEdit.headers[i].hValue, i+1,true);
+                }else{
+                    headerPopulateForm(channelToEdit.headers[i].hKey, channelToEdit.headers[i].hValue, i+1,false);
+                }
+            }
+        }
+    }
 }
 
 function participantPopulateForm(theParticipant,index,last){
@@ -645,20 +673,38 @@ function retrieveForm(){
     zipRetrived = document.getElementById('zip').value;
     cityRetrieved = document.getElementById('city').value;
     countryRetrieved = document.getElementById('country').value;
+
     for(var attr in extrasPersisted){
         if(extrasPersisted.hasOwnProperty(attr))
             extraBuilt.push(extrasPersisted[attr]);
     }
 
-    locationBuilt = {
-        lng:longRetrived, 
+    /*locationBuilt = {
+        lng:longRetrived,
         lat:latRetrived,
         addr: addressRetrieved,
         zip:zipRetrived,
         city:cityRetrieved,
         country:countryRetrieved,
         extras:extraBuilt
-    };
+    };*/
+
+    //Location 
+    var attrs = ['lng', 'lat', 'addr', 'zip', 'city', 'country'];
+    var retrievedValues = [longRetrived, latRetrived, addressRetrieved,
+    zipRetrived, cityRetrieved, countryRetrieved];
+
+    for(var i = 0; i < attrs.length; i++){
+        locationBuilt[attrs[i]] = retrievedValues[i];
+        if(locationBuilt[attrs[i]] == ""){
+            delete locationBuilt[attrs[i]];
+        }
+    }
+
+    locationBuilt['extras'] = extraBuilt;
+    if(locationBuilt['extras'].length == 0){
+        delete locationBuilt['extras'];
+    }
 
     hostRetrived = document.getElementById('host').value;
     ownerRetrived = document.getElementById('owner').value;
@@ -683,10 +729,6 @@ function retrieveForm(){
 
 function editCollection(newChan){
     channels.get(newChan.id).attributes = newChan;
-}
-
-function disconnect(){
-    hClient.disconnect();
 }
 
 function requestInProgress(command){
@@ -803,7 +845,6 @@ function hCallback(msg){
             }
             responseReceived("getChannels");
             console.log("All Channels retrieved !");
-            console.log(channels);
             listChannelView.setCollection(channels);
         }else{
             if(msg.data.status == 0){
@@ -811,7 +852,8 @@ function hCallback(msg){
                 $(document).trigger('createUpdate');
                 console.log("Channel created & persisted !");
             }else{
-                console.log("ERROR n°: !!!" + msg.data.status)
+                console.log("ERROR n°: !!!" + msg.data.status);
+                console.log(msg.data.result);
             }
         }
     }

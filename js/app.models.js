@@ -1,16 +1,12 @@
 (function($) {
     window.Channel = Backbone.Model.extend({
         defaults : {
-            id : "",
-            chid : "",
-            chdesc : "",
-            priority : "",
-            location : "",
-            host : "",
-            owner : "",
+            id : undefined,
+            chid : undefined,
+            host : undefined,
+            owner : undefined,
             participants : [],
-            active : "",
-            headers : []
+            active : undefined
         },
         initialize : function () {
             this.bind("error", function(model, error) {
@@ -18,12 +14,12 @@
             });
             this.bind("change", function(model, error) {
                 minimumRaised = true;
-                console.log("MODEL UPDATED!");
+                //console.log("MODEL UPDATED!");
             });
         },
         validate: function (attrs) {
-            if(attrs.chid == "" || attrs.host == "" 
-                || attrs.owner == "" || attrs.participants.length == 0
+            if(attrs.chid == undefined || attrs.host == undefined 
+                || attrs.owner == undefined || attrs.participants.length == 0
                 || typeof attrs.active !== 'boolean'){
                 return "Missing fields !"
             }

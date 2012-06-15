@@ -11,7 +11,7 @@
         },
         initialize : function(){
             console.log("Backbone is launched !");
-            
+
             connectionView = new viewConnection({el:"#content"});
             homeView = new viewHomeConsole({el:"#content"});
             listChannelView = new viewListChannel({el:"#tabContent"});
@@ -51,16 +51,9 @@
     launcher.vent = _.extend({}, Backbone.Events);
 
     $(function(){
-        $(document).bind('connected', function () {
-            console.log('document connected');
-            router = new launcher();
-            Backbone.history.start();
-        });
-        $(document).bind('reattached', function () {
-            console.log('document reattached');
-            router = new launcher();
-            Backbone.history.start();
-        });
+        console.log('document connected');
+        router = new launcher();
+        Backbone.history.start();
     });
 
 })(jQuery)

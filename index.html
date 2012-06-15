@@ -30,10 +30,11 @@
     </body>
     <script type="text/template" id="template-connection">
         <form>
+            <span class="alert"></span>
             <fieldset>
             <legend align=top> Connection </LEGEND>
-            User : <INPUT name="user" type="text"/>
-            Password : <INPUT name="Passwordd" type="text"/>
+            User : <INPUT id="user" type="text"/>
+            Password : <INPUT id="password" type="text"/>
             <INPUT type="button" id="connection" value="Connection"/>
             </FIELDSET>
         </form>
@@ -99,13 +100,14 @@
             <tr id="tr_desc">
                 <td>Description</td>
                 <td>
-                    <TEXTAREA rows="3"cols="30" name="chdesc" id="chdesc">Channel description</TEXTAREA>
+                    <TEXTAREA rows="3"cols="30" name="chdesc" id="chdesc"></TEXTAREA>
                 </td>
             </tr>
             <tr id="tr_priority">
                 <td>Priority</td>
                 <td>
                     <SELECT name="priority" id="priority">
+                        <OPTION VALUE="notDefined"></OPTION>
                         <OPTION VALUE="trace">Trace</OPTION>
                         <OPTION VALUE="info">Info</OPTION>
                         <OPTION VALUE="warning">Warning</OPTION>
