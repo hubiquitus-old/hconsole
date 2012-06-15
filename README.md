@@ -34,6 +34,6 @@ All other fields are optionnal.
 To add an extra into the location, a participant or an header, you have to click on the "Add" button to validate it. 
 You can delete all entry with the "Delete" button.
 
-####Specification for edit form page
+####Specifications for edit form page
 When you want to edit your channel, you can't change the id, the host and the owner that is you.
 All other fields can be changed.
