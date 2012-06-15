@@ -37,14 +37,7 @@
         },
         editChannel : function(){
             cleanRequestState();
-            editChannelView.render();
-            $("#create").css("display", "none");
-
-            var channelToEdit = channels.filter(function(channel){return channel.getChid() == idRow});
-            channelToEdit = channelToEdit[0].attributes;
-            populateForm(channelToEdit);
-
-            document.getElementById('title').innerHTML = "Edit " +idRow+"@"+channelToEdit.host;
+            editChannelView.render(); 
         }
     });
 

@@ -109,7 +109,19 @@
 
         editChannel: function(e){
             idRow = e.currentTarget.cells[0].textContent;
-            router.navigate("channel/edit/:id", {trigger: true});
+
+            var channelToEdit = channels.filter(function(channel){return channel.getChid() == idRow});
+            channelToEdit = channelToEdit[0].attributes;
+
+            if(channelToEdit.owner != currentUser){
+                alert("You can't edit a channel that isn't yours");
+            }else{
+                router.navigate("channel/edit/:id", {trigger: true});
+                $("#create").css("display", "none");
+                populateForm(channelToEdit);
+                document.getElementById('title').innerHTML = "Edit " +idRow+"@"+channelToEdit.host;
+            }
+
             return this;
         },
         createChannel: function(){
@@ -120,8 +132,6 @@
             this.template = _.template($("#template-channelListPage").html());
             this.collection = channels;
             _.bindAll(this,"render");
-
-            //console.log("List initialized");
         },
         render: function(){
             this.setElement($("#tabContent"));
@@ -180,15 +190,15 @@
 
                 channelToCreate = channelToCreate.attributes;
 
-                if(channelToCreate.chdesc == ""){
-                    console.log("suppression desc");
-                    delete channelToCreate.chdesc;
-                }
                 if(channelToCreate.priority == 6){
                     console.log("suppression priority");
                     delete channelToCreate.priority;
                 }
-                /*if(_.isEmpty(channelToCreate.location)){
+                /*if(channelToCreate.chdesc == ""){
+                    console.log("suppression desc");
+                    delete channelToCreate.chdesc;
+                }
+                if(_.isEmpty(channelToCreate.location)){
                     console.log("suppression location");
                     delete channelToCreate.location;
                 }
@@ -258,15 +268,15 @@
 
             channRecup = channRecup.attributes;
 
-            if(channRecup.chdesc == ""){
-                console.log("suppression desc");
-                delete channRecup.chdesc;
-            }
             if(channRecup.priority == 6){
                 console.log("suppression priority");
                 delete channRecup.priority;
             }
-            /*if(_.isEmpty(channRecup.location)){
+            /*if(channRecup.chdesc == ""){
+                console.log("suppression desc");
+                delete channRecup.chdesc;
+            }
+            if(_.isEmpty(channRecup.location)){
                 console.log("suppression location");
                 delete channRecup.location;
             }
