@@ -51,7 +51,7 @@
                 $(".alert").empty();
                 if(currentUser == "" || userPassword == ""){
                     $(".alert").html("You have to fill all blanks to be connected");
-                }else if(!/^\w+@\w(\.|\w)*$/.test(currentUser)){
+                }else if(!hClient.checkJID(currentUser)){
                     $(".alert").html("User Malformat ! Please use this format : word@word");
                 }else{
                     setTimeout(function(){
