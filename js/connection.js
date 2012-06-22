@@ -16,12 +16,11 @@
  *     You should have received a copy of the GNU General Public License
  *     along with Hubiquitus.  If not, see <http://www.gnu.org/licenses/>.
  */
-var extrasPersisted = {};
+
 var headersPersisted = {};
 var participantsPersisted = {};
 var publicCounter = 0;
 var participantCounter = 0;
-var extraCounter = 0;
 var idRow = null;
 var currentOwner = null;
 var current = [];
@@ -40,7 +39,6 @@ var addressRetrieved = null;
 var zipRetrived = null;
 var cityRetrieved = null;
 var countryRetrieved = null;
-var extraBuilt = [];
 var hostRetrived = null;
 var ownerRetrived = null;
 var participantBuilt = [];
@@ -72,7 +70,7 @@ var hOptions = {
 };
 
 //inits
-var hnodeName = "hnode.";
+var hnodeName = "hnode@";
 
 function connection(user,password){
     hClient.onStatus = onHStatus;
@@ -245,18 +243,6 @@ function populateForm(channelToEdit){
             var country = channelToEdit.location.country;
             $("#tr_location td input#country").attr("value", country);
         }
-
-        //Populate extra fileds
-        if(channelToEdit.location.extras != undefined){
-            for(var i = 0; i < channelToEdit.location.extras.length; i++){
-                if(i==(channelToEdit.location.extras.length-1))
-                {
-                    extraPopulateForm(channelToEdit.location.extras[i].name, channelToEdit.location.extras[i].value, i+1,true);
-                }else{
-                    extraPopulateForm(channelToEdit.location.extras[i].name, channelToEdit.location.extras[i].value, i+1,false);
-                }
-            }
-        }
     }
 
     //Host
@@ -412,70 +398,6 @@ function headerPopulateForm(key,value,index,last){
     }
 }
 
-function extraPopulateForm(theName,theValue,index,last){
-    if(index==1){
-        $("#extra_name"+index).attr("value",theName);
-        $("#extra_value"+index).attr("value",theValue);
-        $("#deleteExtra"+index).css("display", "inline");
-        $("#addExtra"+index).attr("disabled","disabled");
-        $("#extra_name"+index).attr("disabled","disabled");
-        $("#extra_value"+index).attr("disabled","disabled");
-    }else{
-        var new_div = jQuery ('<div id="extra'+index+'"></div>');
-        $("#extra_inputs").append(new_div);
-
-        //Add li balise 
-        $("#extra"+index).append('<li>');
-
-        var extraNameInput = document.createElement("input"); 
-        extraNameInput.type = "text";
-        extraNameInput.id = "extra_name"+index;  
-        extraNameInput.size = 2; 
-        extraNameInput.value = theName;
-        $("#extra" + index + " li").append(extraNameInput);
-
-        $("#extra" + index + " li").append(" ");
-        
-        var extraValueInput = document.createElement("input"); 
-        extraValueInput.type = "text"; 
-        extraValueInput.id = "extra_value"+index;
-        extraValueInput.size = 2;  
-        extraValueInput.value = theValue;
-        $("#extra" + index + " li").append(extraValueInput);  
-
-        $("#extra" + index + " li").append(" ");
-
-        var addInput = document.createElement("input"); 
-        addInput.id = "addExtra"+index;
-        addInput.type = "button";
-        addInput.value = "A";
-        addInput.setAttribute("disabled", "disabled");
-        $("#extra" + index + " li").append(addInput); 
-
-        $("#extra" + index + " li").append(" ");
-
-        var deleteInput = document.createElement("input"); 
-        deleteInput.id = "deleteExtra"+index;
-        deleteInput.type = "button";
-        deleteInput.value = "X";
-        deleteInput.setAttribute("onClick","deleteInputs(this)");
-        $("#extra" + index + " li").append(deleteInput); 
-
-        $("#extra_name"+index).attr("disabled","disabled");
-        $("#extra_value"+index).attr("disabled","disabled");
-        $("#addExtra"+index).attr("disabled","disabled");
-    }
-    if(last==true){
-        addExtraInputs(index);
-    }
-
-    //Persist objets into a var
-    extrasPersisted[index] = {
-            name : $("#extra_name"+index).val(),
-            value : $("#extra_value"+index).val()
-        }
-}
-
 function addHeaderInputs(counter) {
 
     if($("#key"+counter).val()=="" || $("#value"+counter).val()==""){
@@ -587,74 +509,9 @@ function addParticipantInput(counter){
     }
 }
 
-function addExtraInputs(counter){
-    if($("#extra_name"+counter).val()=="" || $("#extra_value"+counter).val()==""){
-        alert("You have to inform the extra name and value to be registered !");
-    }else{
-        //Avoid the user to delete any header
-        $("#deleteExtra"+counter).css("display", "inline");
-        
-        //Update compteurs
-        if(extraCounter != counter)
-            extraCounter = counter;
-        extraCounter++;
-
-        //Persist objets into a var
-        extrasPersisted[counter] = {
-            name : $("#extra_name"+counter).val(),
-            value : $("#extra_value"+counter).val()
-        }
-
-        //Avoid headers edition.
-        $("#extra_name"+counter).attr("disabled","disabled");
-        $("#extra_value"+counter).attr("disabled","disabled");
-        $("#addExtra"+counter).attr("disabled","disabled");
-
-        var new_div = jQuery ('<div id="extra'+extraCounter+'"></div>');
-        $("#extra_inputs").append(new_div);
-
-        //Add li balise 
-        $("#extra"+extraCounter).append('<li>');
-
-        var extraNameInput = document.createElement("input"); 
-        extraNameInput.type = "text";
-        extraNameInput.id = "extra_name"+extraCounter;  
-        extraNameInput.size = 2; 
-        $("#extra" + extraCounter + " li").append(extraNameInput);
-
-        $("#extra" + extraCounter + " li").append(" ");
-        
-        var extraValueInput = document.createElement("input"); 
-        extraValueInput.type = "text"; 
-        extraValueInput.id = "extra_value"+extraCounter;
-        extraValueInput.size = 2;  
-        $("#extra" + extraCounter + " li").append(extraValueInput);  
-
-        $("#extra" + extraCounter + " li").append(" ");
-
-        var addInput = document.createElement("input"); 
-        addInput.id = "addExtra"+extraCounter;
-        addInput.type = "button";
-        addInput.value = "A";
-        addInput.setAttribute("onClick","addExtraInputs(extraCounter)")
-        $("#extra" + extraCounter + " li").append(addInput); 
-
-        $("#extra" + extraCounter + " li").append(" ");
-
-        var deleteInput = document.createElement("input"); 
-        deleteInput.id = "deleteExtra"+extraCounter;
-        deleteInput.type = "button";
-        deleteInput.value = "X";
-        deleteInput.setAttribute("style","display:none");
-        deleteInput.setAttribute("onClick","deleteInputs(this)");
-        $("#extra" + extraCounter + " li").append(deleteInput); 
-    } 
-}
-
 function deleteInputs(inputToDelete){
     var isAnHeader = inputToDelete.id.indexOf("deleteHeader");
     var isAParticipant = inputToDelete.id.indexOf("deleteParticipant");
-    var isAnExtra = inputToDelete.id.indexOf("deleteExtra");
     var identifier = null;
     
     if(isAnHeader != -1){
@@ -674,21 +531,11 @@ function deleteInputs(inputToDelete){
 
         delete participantsPersisted[identifier];
     }
-    
-    if(isAnExtra != -1){
-        console.log("DELETE ONE EXTRA");
-        identifier = inputToDelete.id.replace("deleteExtra","")
-
-        $("#extra"+identifier).remove();
-
-        delete extrasPersisted[identifier];
-    }    
 }
 
 function retrieveForm(){
     headerBuilt = [];
     participantBuilt = [];
-    extraBuilt = [];
 
     idRetrived = document.getElementById("chid").value;
     descRetrived = document.getElementById('chdesc').value;
@@ -701,11 +548,6 @@ function retrieveForm(){
     cityRetrieved = document.getElementById('city').value;
     countryRetrieved = document.getElementById('country').value;
 
-    for(var attr in extrasPersisted){
-        if(extrasPersisted.hasOwnProperty(attr))
-            extraBuilt.push(extrasPersisted[attr]);
-    }
-
     /*locationBuilt = {
         lng:longRetrived,
         lat:latRetrived,
@@ -713,7 +555,6 @@ function retrieveForm(){
         zip:zipRetrived,
         city:cityRetrieved,
         country:countryRetrieved,
-        extras:extraBuilt
     };*/
 
     //Location 
@@ -726,11 +567,6 @@ function retrieveForm(){
         if(locationBuilt[attrs[i]] == ""){
             delete locationBuilt[attrs[i]];
         }
-    }
-
-    locationBuilt['extras'] = extraBuilt;
-    if(locationBuilt['extras'].length == 0){
-        delete locationBuilt['extras'];
     }
 
     hostRetrived = document.getElementById('host').value;
@@ -751,7 +587,6 @@ function retrieveForm(){
 
     headersPersisted = {};
     participantsPersisted = {};
-    extrasPersisted = {};
 }
 
 function editCollection(newChan){
