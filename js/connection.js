@@ -43,7 +43,7 @@ var hostRetrived = null;
 var ownerRetrived = null;
 var participantBuilt = [];
 var activeRetrived = null;
-var headerBuilt = [];
+var headerBuilt = {};
 var hKeyRetrieved = null;
 var hValueRetrieved = null;
 
@@ -278,14 +278,18 @@ function populateForm(channelToEdit){
 
     //Populate header fields
     if(channelToEdit.headers != undefined){
-        if(channelToEdit.headers.length != 0){
-            for(var i = 0; i < channelToEdit.headers.length; i++){
-                if(i==(channelToEdit.headers.length-1))
-                {
-                    headerPopulateForm(channelToEdit.headers[i].hKey, channelToEdit.headers[i].hValue, i+1,true);
-                }else{
-                    headerPopulateForm(channelToEdit.headers[i].hKey, channelToEdit.headers[i].hValue, i+1,false);
+        //Populate header fields
+        if(channelToEdit.headers != undefined){
+            var i = 0;
+            for(var headerKey in channelToEdit.headers) {
+                if(channelToEdit.headers.hasOwnProperty(headerKey)) {
+                    headerPopulateForm(headerKey, channelToEdit.headers[headerKey], i+1);
+                    i = i+1;
                 }
+            }
+
+            if(i > 0){
+                addHeaderInputs(i);
             }
         }
     }
@@ -337,7 +341,7 @@ function participantPopulateForm(theParticipant,index,last){
     participantsPersisted[index] = $("#jid_participant"+index).val();
 }
 
-function headerPopulateForm(key,value,index,last){
+function headerPopulateForm(key,value,index){
     if(index==1){
         $("#key"+index).attr("value",key);
         $("#value"+index).attr("value",value);
@@ -386,9 +390,6 @@ function headerPopulateForm(key,value,index,last){
         $("#header_inputs input:#key"+index).attr("disabled","disabled");
         $("#header_inputs input:#value"+index).attr("disabled","disabled");
         $("#header_inputs input:#addHeader"+index).attr("disabled","disabled");
-    }
-    if(last==true){
-        addHeaderInputs(index);
     }
 
     //Persist objets into a var
@@ -534,7 +535,7 @@ function deleteInputs(inputToDelete){
 }
 
 function retrieveForm(){
-    headerBuilt = [];
+    headerBuilt = {}
     participantBuilt = [];
 
     idRetrived = document.getElementById("chid").value;
@@ -582,7 +583,7 @@ function retrieveForm(){
 
     for(var attr in headersPersisted){
         if(headersPersisted.hasOwnProperty(attr))
-            headerBuilt.push(headersPersisted[attr]);
+            headerBuilt[headersPersisted[attr].hKey] = headersPersisted[attr].hValue;
     }
 
     headersPersisted = {};
