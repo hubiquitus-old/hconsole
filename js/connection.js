@@ -71,8 +71,12 @@ var hOptions = {
     endpoints: [""]
 };
 
+//inits
+var hnodeName = "hnode.";
+
 function connection(user,password){
-    hClient.connect(user,password,hCallback,hOptions);
+    hClient.onStatus = onHStatus;
+    hClient.connect(user,password,hOptions);
 }
 
 function disconnect(){
@@ -84,23 +88,43 @@ function disconnect(){
 
 function getChannels(){
     var commandGetChann = {
-        entity : 'hnode.' + hClient.domain,
+        entity : hnodeName + hClient.domain,
         cmd : 'hgetchannels',
         params : ""
     };
-    
-    idGetChann = hClient.command(commandGetChann);
+
+    var callback = function (hResult) {
+        var result = hResult.result;
+        for(var i =0; i < result.length; i++){
+            result[i].id = result[i].chid;
+            channels.add(result[i]);
+        }
+        responseReceived("getChannels");
+        console.log("All Channels retrieved !");
+        listChannelView.setCollection(channels);
+    }
+    idGetChann = hClient.command(commandGetChann, callback);
 }
 
 function createUpdateChannel(theChannel){
     console.log("createUpdateChannel :", theChannel);
     var commandCreateUpdateChann = {
-        entity : 'hnode.' + hClient.domain,
+        entity : hnodeName + hClient.domain,
         cmd : 'hcreateupdatechannel',
         params : theChannel
     };
-    
-    idCreateUpdateChann = hClient.command(commandCreateUpdateChann);
+
+    var callback = function(hResult) {
+        if(hResult.status == 0){
+            responseReceived("createUpdate");
+            $(document).trigger('createUpdate');
+            console.log("Channel created & persisted !");
+        }else{
+            console.log("ERROR n°: " + hResult.status);
+            console.log("ERROR Type : ", hResult.result);
+        }
+    }
+    idCreateUpdateChann = hClient.command(commandCreateUpdateChann, callback);
 }
 
 function conversePriorityToCode(priority){
@@ -516,7 +540,7 @@ function addHeaderInputs(counter) {
 
 function addParticipantInput(counter){
 
-    if(!/^\w+@\w(\.|\w)*$/.test($("#jid_participant"+counter).val())){
+    if(!checkJID($("#jid_participant"+counter).val())){
         alert("Participant Malformat ! Please use this format : word@word(.word)");
     }else if($("#jid_participant"+counter).val()==""){
         alert("You have to fill the blank before add a participant");
@@ -746,97 +770,107 @@ function cleanRequestState(){
     $("#requete").html("No request !");
 }
 
-function hCallback(msg){
+function onHStatus(hStatus) {
+    switch(hStatus.status){
+        case hClient.statuses.CONNECTED:
+            status = 'Connected';
+            $(document).trigger('connected');
+            currentOwner = hClient.publisher;
+            break;
+        case hClient.statuses.CONNECTING:
+            status = 'Connecting';
+            break;
+        case hClient.statuses.REATTACHING:
+            status = 'Reattaching';
+            break;
+        case hClient.statuses.REATTACHED:
+            status = 'Reattached';
+            $(document).trigger('reattached');
+            currentOwner = hClient.publisher;
+            break;
+        case hClient.statuses.DISCONNECTING:
+            status = 'Disconnecting';
+            break;
+        case hClient.statuses.DISCONNECTED:
+            status = 'Disconnected';
+            break;
+    }
+
+    switch(hStatus.errorCode){
+        case hClient.errors.NO_ERROR:
+            error = 'No Error Detected';
+            break;
+        case hClient.errors.JID_MALFORMAT:
+            error = 'JID Malformat';
+            break;
+        case hClient.errors.CONN_TIMEOUT:
+            error = 'Connection timed out';
+            break;
+        case hClient.errors.AUTH_FAILED:
+            error = 'Authentication failed';
+            break;
+        case hClient.errors.ATTACH_FAILED:
+            error = 'Attach failed';
+            break;
+        case hClient.errors.ALREADY_CONNECTED:
+            error = 'A connection is already opened';
+            break;
+        case hClient.errors.TECH_ERROR:
+            error = 'Technical Error: ';
+            error += hStatus.errorMsg;
+            break;
+        case hClient.errors.NOT_CONNECTED:
+            error = 'Not connected';
+            break;
+        case hClient.errors.CONN_PROGRESS:
+            error = 'A connection is already in progress';
+            break;
+    }
+
+    //Couleurs des status
+    if(status == 'Connected' || status == 'Reattached'){
+        $("#status").removeClass(function() {
+            return $("#status").prev().attr('class');
+        });
+        $("#status").addClass("green");
+        document.getElementById("status").innerHTML = JSON.stringify("Status : "+ status + ' / <span id=error>' + error + '</span>');
+    }
+    if(status == 'Connecting' || status == 'Reattaching' || status == 'Disconnecting'){
+        $("#status").removeClass(function() {
+            return $("#status").prev().attr('class');
+        });
+        $("#status").addClass("orange");
+        document.getElementById("status").innerHTML = JSON.stringify("Status : "+ status + ' / <span id=error>' + error + '</span>');
+    }
+    if(status == 'Disconnected'){
+        $("#status").removeClass(function() {
+            return $("#status").prev().attr('class');
+        });
+        $("#status").addClass("red");
+        document.getElementById("status").innerHTML = JSON.stringify("Status : "+ status + ' / <span id=error>' + error + '</span>');
+    }
+    if(error == 'No Error Detected'){
+        $("#error").removeClass(function() {
+            return $("#error").prev().attr('class');
+        });
+        $("#error").addClass("green");
+    }else{
+        $("#error").removeClass(function() {
+            return $("#error").prev().attr('class');
+        });
+        $("#error").addClass("red");
+    }
+}
+
+
+//temporary patch coming from 0.3.10 preview
+var checkJID = function(jid) {
+    return new RegExp("^(?:([^@/<>'\"]+)@)([^@/<>'\"]+)(?:/([^/<>'\"]*))?$").test(jid);
+}
+
+/*function hCallback(msg){
     if(msg.type == 'hStatus'){
-        switch(msg.data.status){
-            case hClient.status.CONNECTED:
-                status = 'Connected';
-                $(document).trigger('connected');
-                currentOwner = hClient.publisher;
-                break;
-            case hClient.status.CONNECTING:
-                status = 'Connecting';
-                break;
-            case hClient.status.REATTACHING:
-                status = 'Reattaching';
-                break;
-            case hClient.status.REATTACHED:
-                status = 'Reattached';
-                $(document).trigger('reattached');
-                currentOwner = hClient.publisher;
-                break;
-            case hClient.status.DISCONNECTING:
-                status = 'Disconnecting';
-                break;
-            case hClient.status.DISCONNECTED:
-                status = 'Disconnected';
-                break;
-        }
-
-        switch(msg.data.errorCode){
-            case hClient.errors.NO_ERROR:
-                error = 'No Error Detected';
-                break;
-            case hClient.errors.JID_MALFORMAT:
-                error = 'JID Malformat';
-                break;
-            case hClient.errors.CONN_TIMEOUT:
-                error = 'Connection timed out';
-                break;
-            case hClient.errors.AUTH_FAILED:
-                error = 'Authentication failed';
-                break;
-            case hClient.errors.ATTACH_FAILED:
-                error = 'Attach failed';
-                break;
-            case hClient.errors.ALREADY_CONNECTED:
-                error = 'A connection is already opened';
-                break;
-            case hClient.errors.TECH_ERROR:
-                error = 'Technical Error: ';
-                error += msg.data.errorMsg;
-                break;
-            case hClient.errors.NOT_CONNECTED:
-                error = 'Not connected';
-                break;
-            case hClient.errors.CONN_PROGRESS:
-                error = 'A connection is already in progress';
-                break;
-        }
-
-        //Couleurs des status
-        if(status == 'Connected' || status == 'Reattached'){
-            $("#status").removeClass(function() {
-              return $("#status").prev().attr('class');
-            });
-            $("#status").addClass("green");
-            document.getElementById("status").innerHTML = JSON.stringify("Status : "+ status + ' / <span id=error>' + error + '</span>');
-        }
-        if(status == 'Connecting' || status == 'Reattaching' || status == 'Disconnecting'){
-            $("#status").removeClass(function() {
-              return $("#status").prev().attr('class');
-            });
-            $("#status").addClass("orange");
-            document.getElementById("status").innerHTML = JSON.stringify("Status : "+ status + ' / <span id=error>' + error + '</span>');
-        }
-        if(status == 'Disconnected'){
-            $("#status").removeClass(function() {
-              return $("#status").prev().attr('class');
-            });
-            $("#status").addClass("red");
-            document.getElementById("status").innerHTML = JSON.stringify("Status : "+ status + ' / <span id=error>' + error + '</span>');
-        }
-        if(error == 'No Error Detected'){
-            $("#error").removeClass(function() {
-              return $("#error").prev().attr('class');
-            });
-            $("#error").addClass("green");
-        }else{
-            $("#error").removeClass(function() {
-              return $("#error").prev().attr('class');
-            });
-            $("#error").addClass("red");
-        }
+        
     }
     else if (msg.type == 'hResult'){
         if(msg.data.reqid == idGetChann){
@@ -859,4 +893,4 @@ function hCallback(msg){
             }
         }
     }
-}
+}     */
