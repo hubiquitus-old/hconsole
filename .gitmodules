@@ -1,0 +1,3 @@
+[submodule "libs/hubiquitusjs"]
+	path = libs/hubiquitusjs
+	url = git://github.com/hubiquitus/hubiquitusjs.git
