@@ -1,0 +1,405 @@
+<!--
+ * Copyright (c) Novedia Group 2012.
+ *
+ *     This file is part of Hubiquitus.
+ *
+ *     Hubiquitus is free software: you can redistribute it and/or modify
+ *     it under the terms of the GNU General Public License as published by
+ *     the Free Software Foundation, either version 3 of the License, or
+ *     (at your option) any later version.
+ *
+ *     Hubiquitus is distributed in the hope that it will be useful,
+ *     but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *     GNU General Public License for more details.
+ *
+ *     You should have received a copy of the GNU General Public License
+ *     along with Hubiquitus.  If not, see <http://www.gnu.org/licenses/>.
+ -->
+ 
+ <!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Launcher app</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <!-- Hubiquitus -->
+    <script src='./hubiquitusjs/lib/transports/socketio/socket.io.js'></script>
+    <script data-main="./hubiquitusjs/hubiquitus.js" src='./hubiquitusjs/lib/require.js'></script>
+
+    <!-- Le styles -->
+    <link href="./assets/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+      body {
+        padding-top: 60px; /* 60px to make the container go all the way to the bottom of the topbar */
+      }
+    </style>
+    <link href="assets/css/bootstrap-responsive.min.css" rel="stylesheet">
+
+    <!-- Le HTML5 shim, for IE6-8 support of HTML5 elements -->
+    <!--[if lt IE 9]>
+      <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+    <script src="assets/js/jquery.js"></script>
+    <script src="assets/js/bootstrap.min.js"></script>
+
+    <script src="assets/js/launcher.js"></script>
+
+  </head>
+
+  <body>
+
+  <!-- Login View -->
+  <div id="loginView" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="loginViewLabel" aria-hidden="true" style="display: none; ">
+      <div class="modal-header">
+          <h3 id="loginViewLabel">Connect</h3>
+      </div>
+      <div class="modal-body">
+          <div class="alert hide">
+              <button type="button" class="close" onclick="$('#loginView .alert').hide();">×</button>
+              <span></span>
+          </div>
+
+          <form class="form-horizontal">
+              <div class="control-group">
+                  <label class="control-label" for="inputUser">User</label>
+                  <div class="controls">
+                      <input type="text" id="inputUser" placeholder="admin@localhost" value="admin@localhost">
+                  </div>
+              </div>
+              <div class="control-group">
+                  <label class="control-label" for="inputPassword">Password</label>
+                  <div class="controls">
+                      <input type="password" id="inputPassword" placeholder="Password" value="admin">
+                  </div>
+              </div>
+              <div class="control-group">
+                  <label class="control-label" for="inputEndpoint">Endpoint</label>
+                  <div class="controls">
+                      <input type="text" id="inputEndpoint" placeholder="http://localhost:8080" value="http://localhost:8080">
+                  </div>
+              </div>
+          </form>
+      </div>
+
+      <div class="modal-footer">
+          <button type="button" class="btn btn-primary" data-loading-text="Signing...">Sign in</button>
+      </div>
+  </div>
+  <script type="text/javascript">
+      $('#loginView').modal({show: true, backdrop: 'static', keyboard:false});
+
+      $('#loginView form').keypress(function (e){
+          code = e.keyCode ? e.keyCode : e.which;
+          if(code.toString() == 13)
+              $('#loginView .btn-primary').triggerHandler('click');
+      })
+
+      //put login callback
+      loginCb = function(hStatus) {
+          if(hStatus.status == 6) { //err disconnected
+              $('#loginView #inputUser').removeAttr('disabled');
+              $('#loginView #inputPassword').removeAttr('disabled');
+              $('#loginView #inputEndpoint').removeAttr('disabled');
+              $('#loginView .btn-primary').button('reset');
+
+              $('#loginView .alert span').text("Disconnected with error code " + hStatus.errorCode + " and error message " + hStatus.errorMsg);
+              $('#loginView .alert').show();
+
+              $('#loginView').modal('show');
+
+          } else if (hStatus.status == 2) {
+              $('#loginView').modal('hide');
+              $('#loginView #inputUser').removeAttr('disabled');
+              $('#loginView #inputPassword').removeAttr('disabled');
+              $('#loginView #inputEndpoint').removeAttr('disabled');
+              $('#loginView #inputUser').val("");
+              $('#loginView #inputPassword').val("");
+              $('#loginView #inputEndpoint').val("");
+              $('#loginView .btn-primary').button('reset');
+          }
+      }
+
+      //add login function
+      $('#loginView .btn-primary').click(function(ev) {
+          $('#loginView #inputUser').attr('disabled','disabled');
+          $('#loginView #inputPassword').attr('disabled','disabled');
+          $('#loginView #inputEndpoint').attr('disabled','disabled');
+          $('#loginView .btn-primary').button('loading');
+
+          //Sign in
+          login($('#loginView #inputUser').val(), $('#loginView #inputPassword').val(), $('#loginView #inputEndpoint').val());
+      });
+  </script>
+
+  <!-- End Login View -->
+
+  <!-- Update channel View -->
+  <div id="updateChannelView" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="updateChannelViewLabel" aria-hidden="true" style="display: none; ">
+      <div class="modal-header">
+          <h3 id="updateChannelViewLabel">Update/Create channel</h3>
+      </div>
+      <div class="modal-body">
+          <div class="alert hide">
+              <button type="button" class="close" onclick="$('#updateChannelView .alert').hide();">×</button>
+              <span></span>
+          </div>
+
+          <form class="form-horizontal">
+              <div class="control-group">
+                  <label class="control-label" for="inputActor">Actor</label>
+                  <div class="controls">
+                      <input type="text" id="inputActor" placeholder="#channelName@domain" value="">
+                  </div>
+              </div>
+              <div class="control-group">
+                  <label class="control-label" for="inputOwner">Owner</label>
+                  <div class="controls">
+                      <input type="text" id="inputOwner" placeholder="" value="" disabled>
+                  </div>
+              </div>
+              <div class="control-group">
+                  <label class="control-label" for="inputSubscribers">Subscribers</label>
+                  <div class="controls">
+                      <input type="text" id="inputSubscribers" placeholder="u1@localhost, u2@localhost" value="">
+                  </div>
+              </div>
+              <div class="control-group">
+                  <label class="control-label" for="inputFilter">Filter</label>
+                  <div class="controls">
+                      <input type="text" id="inputFilter" placeholder="" value="">
+                  </div>
+              </div>
+              <div class="control-group">
+                  <label class="controls radio inline">
+                      <input type="radio" name="enableRadios" id="enabledRadio" value="1" checked>
+                      enabled
+                  </label>
+                  <label class="controls radio inline">
+                      <input type="radio" name="enableRadios" id="disabledRadio" value="0">
+                      Disabled
+                  </label>
+              </div>
+          </form>
+      </div>
+
+      <div class="modal-footer">
+          <button type="button" class="btn btn-inverse">Cancel</button>
+          <button type="button" class="btn btn-primary" data-loading-text="Saving...">Save</button>
+      </div>
+  </div>
+  <script type="text/javascript">
+      //$('#loginView').modal({show: true, backdrop: 'static', keyboard:false});
+
+      $('#updateChannelView form').keypress(function (e){
+          code = e.keyCode ? e.keyCode : e.which;
+          if(code.toString() == 13)
+              $('#updateChannelView .btn-primary').triggerHandler('click');
+      })
+
+      $('#updateChannelView .btn-primary').click(function(ev) {
+          saveChannel();
+      });
+
+      $('#updateChannelView .btn-inverse').click(function(ev) {
+          $('#updateChannelView').modal('hide');
+          resetChannelToModify();
+      });
+  </script>
+
+  <!-- End Update channel View -->
+
+  <!-- bot name View -->
+  <div id="botNameView" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="botNameViewLabel" aria-hidden="true" style="display: none; ">
+      <div class="modal-body">
+          <form class="form-horizontal">
+              <div class="control-group">
+                  <label class="control-label" for="inputBotName">Bot name</label>
+                  <div class="controls">
+                      <input type="text" id="inputBotName" placeholder="Bot Name" value="">
+                  </div>
+              </div>
+              <div class="control-group">
+                  <label class="control-label" for="inputArchiveName">Archive Name</label>
+                  <div class="controls">
+                      <input type="text" id="inputArchiveName" placeholder="" value="" disabled>
+                  </div>
+              </div>
+          </form>
+      </div>
+
+      <div class="modal-footer">
+          <button type="button" class="btn btn-inverse">Cancel</button>
+          <button type="button" class="btn btn-primary">Deploy</button>
+      </div>
+  </div>
+  <script type="text/javascript">
+      //$('#loginView').modal({show: true, backdrop: 'static', keyboard:false});
+
+      $('#botNameView form').keypress(function (e){
+          code = e.keyCode ? e.keyCode : e.which;
+          if(code.toString() == 13)
+              $('#botNameView .btn-primary').triggerHandler('click');
+      })
+
+      $('#botNameView .btn-primary').click(function(ev) {
+          deploy($('#botNameView #inputArchiveName').val(), $('#botNameView #inputBotName').val());
+          $('#botNameView').modal('hide');
+      });
+
+      $('#botNameView .btn-inverse').click(function(ev) {
+          $('#botNameView').modal('hide');
+      });
+  </script>
+
+  <!-- bot name View -->
+
+  <!-- NavBar -->
+  <div id="nav" class="navbar navbar-inverse navbar-fixed-top">
+      <div class="navbar-inner">
+          <div class="container">
+              <span class="brand" href="#">Hubiquitus Launcher</span>
+
+              <ul class="nav pull-right">
+                  <li><button class="btn btn-inverse" type="button">Disconnect</button></li>
+                  <li><img id="hubStatus" src="assets/img/hub_disconnected.png" alt="Hub status" style="padding-top: 5px; padding-left: 20px;"/></li>
+              </ul>
+
+          </div>
+
+      </div>
+  </div>
+
+  <script type="text/javascript">
+      //add login function
+      $('#nav .btn').click(function(ev) {
+          hClient.disconnect();
+      });
+  </script>
+  <!-- End Nav Bar -->
+
+
+  <!-- Content -->
+  <div class="tabbable">
+      <ul class="nav nav-tabs" id="contentTabs" style="padding-left: 40px;">
+          <li><a href="#bots" class="active" data-toggle="tab">Bots</a></li>
+          <li><a href="#archives" data-toggle="tab">Archives</a></li>
+          <li><a href="#channels" data-toggle="tab">channels</a></li>
+      </ul>
+
+      <div class="container tab-content">
+          <!-- Bots tab -->
+          <div class="tab-pane active" id="bots">
+              <table class="table table-striped table-hover table-bordered" style="margin-top: 10px;">
+                  <thead>
+                  <tr>
+                      <th>bot name</th>
+                      <th>uuid</th>
+                      <th>bot type</th>
+                      <th>status</th>
+                      <th style="width: 70px;"></th>
+                      <th style="width: 70px;"></th>
+                      <th style="width: 70px;"></th>
+                  </tr>
+                  </thead>
+                  <tbody>
+
+                  </tbody>
+              </table>
+              <script type="text/javascript">
+                  $('a[data-toggle="tab"]').on('shown', function (e) {
+                      if(e.target.hash === '#bots') {
+                          $('#bots .alert').remove();
+                          $('#bots tbody').html('');
+                          getBots();
+                      }
+                  })
+              </script>
+          </div>
+          <!-- End bots tab -->
+
+          <!-- Archives tab -->
+          <div class="tab-pane" id="archives">
+              <!--div class="alert hide">
+                  <button type="button" class="close" onclick="$('#archives .alert').hide();">×</button>
+                  <span></span>
+              </div-->
+              <table class="table table-striped table-hover table-bordered" style="margin-top: 10px;">
+                  <thead>
+                  <tr>
+                      <th>Archive Name</th>
+                      <th style="width: 70px;"></th>
+                  </tr>
+                  </thead>
+                  <tbody>
+
+                  </tbody>
+              </table>
+              <script type="text/javascript">
+                  $('a[data-toggle="tab"]').on('shown', function (e) {
+                      if(e.target.hash === '#archives') {
+                          $('#archives .alert').remove();
+                          $('#archives tbody').html('');
+                          getArchives();
+                      }
+                  })
+              </script>
+          </div>
+          <!-- End archives tab -->
+
+          <!-- Channels tab -->
+          <div class="tab-pane" id="channels">
+              <div class="alert hide">
+                  <button type="button" class="close" onclick="$('#archives .alert').hide();">×</button>
+                  <span></span>
+              </div>
+              <div class="pull-right">
+                  <button type="button" style="margin-top: 10px; margin-bottom: 10px;" class="btn btn-success addChannel">Add Channel</button>
+              </div>
+              <table class="table table-striped table-hover table-bordered">
+                  <thead>
+                  <tr>
+                      <th>Channel name</th>
+                      <th>Owner</th>
+                      <th style="width: 70px;"></th>
+                  </tr>
+                  </thead>
+                  <tbody>
+
+                  </tbody>
+              </table>
+              <script type="text/javascript">
+                  $('a[data-toggle="tab"]').on('shown', function (e) {
+                      if(e.target.hash === '#channels') {
+                          $('#channels .alert').remove();
+                          $('#channels tbody').html('');
+                          getChannels();
+                      }
+                  })
+
+                  $('#channels .addChannel').click(function(ev) {
+                      resetChannelToModify();
+                      showUpdateChannelView();
+                  });
+              </script>
+          </div>
+          <!-- End channels tab -->
+      </div>
+  </div>
+
+  <script type="text/javascript">
+      $(function () {
+          $('#contentTabs .active').tab('show');
+      })
+
+      //setTimeout(function() {addArchive("JavaBot2.zip")}, 3000);
+      //setTimeout(function() {removeArchive("JavaBot2.zip")}, 5000);
+  </script>
+  <!-- End Content -->
+
+  </body>
+</html>
