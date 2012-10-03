@@ -17,9 +17,9 @@
  *     along with Hubiquitus.  If not, see <http://www.gnu.org/licenses/>.
  */
  
-var hubotLauncherJid = "hubotlauncher@localhost";
-var launcherChannelJid = "#hubotlauncher@localhost";
-var hnodeJid = "hnode@localhost";
+var hubotLauncherJid = "hubotlauncher@socialtv";
+var launcherChannelJid = "#hubotlauncher@socialtv";
+var hnodeJid = "hnode@socialtv";
 var loginCb = undefined;
 
 var archives = [];
