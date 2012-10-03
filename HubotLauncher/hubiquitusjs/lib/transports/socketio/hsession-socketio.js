@@ -28,11 +28,11 @@ define(
         var statuses = codes.statuses;
         var errors = codes.errors;
 
-        io = io || socket;
         //Loading exclusive modules for Node
         if(typeof module !== 'undefined' && module.exports){
             io = require('socket.io-client');
         }
+        io = io || socket;
 
         /**
          * Constructor to establish a connection to the socketIO server.
@@ -73,6 +73,7 @@ define(
                 self.addListeners();
                 //Start a new connection
                 self.socket.emit('hConnect', {
+                    sent: new Date(),
                     publisher: self.publisher,
                     password: self.password,
                     serverHost: self.opts.serverHost,
