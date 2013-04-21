@@ -1,0 +1,43 @@
+<style>
+    html, body {
+        background: #f3f3f3;
+        transition: all linear 1s;
+    }
+
+    .actors .row-fluid {
+        border-top: 1px solid #D5D5D5;
+        padding-top: 10px;
+    }
+
+    .actors .row-fluid:first-child {
+        border-top: none;
+    }
+
+    .actors .row-fluid .span2:last-child {
+        text-align: right;
+    }
+</style>
+
+<div class="row-fluid show-grid">
+    <div class="span12">
+        <div data-ng-class="visibility" class="panel" data-ng-repeat="process in processes" data-ng-animate="'fade'">
+            <div class="title"><span>node #{{ process.pid }}</span><span>{{ process.uptime }}</span></div>
+            <div class="row-fluid">
+                <div class="span6">
+                    <div data-chart="loadAvg"></div>
+                    <div data-chart="memory"></div>
+                </div>
+                <div class="span6 actors">
+                    <div class="row-fluid" data-ng-repeat="actor in process.actors" data-ng-animate="'fade'">
+                        <div class="span10"><span class="text-info">{{ actor.id }}</span></div>
+                        <div class="span2">
+                            <span class="label" data-ng-class="{started:'label-info', stopped:'label-warning', ready:'label-success', error:'label-important'}[actor.status]">
+                                {{ actor.status }}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,93 @@
+@import "compass_twitter_bootstrap";
+@import "compass_twitter_bootstrap_awesome";
+@import "compass_twitter_bootstrap_responsive";
+
+[data-ng-cloak] {
+  display: none;
+}
+
+@font-face {
+  font-family: Electrolize;
+  src: url('fonts/Electrolize.woff');
+}
+
+* {
+  font-family: 'Electrolize', sans-serif;
+}
+
+@media (min-width: 979px) {
+  body {
+    padding-top: 60px;
+  }
+
+  .container {
+    max-width: 800px;
+  }
+}
+
+html, body {
+  color: #333333;
+}
+
+.brand img {
+  width: 22px;
+  height: 22px;
+  margin-top: -6px;
+  margin-right: 10px;
+}
+
+.brand span {
+  font-size: 10pt;
+}
+
+.panel {
+  position: relative;
+  margin: 0px 0 20px 0;
+  padding: 39px 19px 14px;
+  *padding-top: 19px;
+  background: #FFFFFF;
+  border: 1px solid #D5D5D5;
+  -webkit-border-radius: 4px;
+  -moz-border-radius: 4px;
+  border-radius: 4px;
+}
+
+.panel .title {
+  position: absolute;
+  top: -1px;
+  left: -1px;
+  width: 100%;
+  padding: 4px 0;
+  font-weight: bold;
+  color: #555;
+  background: #E9E9E9;
+  background: -moz-linear-gradient(top, #FAFAFA 0%, #E9E9E9 100%);
+  background: -webkit-linear-gradient(top, #FAFAFA 0%, #E9E9E9 100%);
+  background: -o-linear-gradient(top, #FAFAFA 0%, #E9E9E9 100%);
+  background: -ms-linear-gradient(top, #FAFAFA 0%, #E9E9E9 100%);
+  background: linear-gradient(top, #FAFAFA 0%, #E9E9E9 100%);
+  border: 1px solid #D5D5D5;
+  border-radius: 4px 4px 0 0;
+}
+
+.panel .title span:first-child {
+  padding-left: 8px;
+}
+
+.panel .title span:last-child {
+  float: right;
+  margin-top: 1px;
+  margin-right: 8px;
+}
+
+.fade-show-setup, .fade-show-start, .fade-enter-setup, .fade-enter-start {
+  transition: all linear 1s;
+}
+
+.fade-show-setup, .fade-enter-setup {
+  opacity: 0;
+}
+
+.fade-show-start, .fade-enter-start {
+  opacity: 1;
+}

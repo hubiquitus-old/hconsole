@@ -1,0 +1,46 @@
+<style>
+    html, body {
+        background: white;
+        transition: all linear 1s;
+    }
+
+    .well {
+        opacity: 0;
+        margin-top: -10px;
+        max-width: 320px;
+        margin-left: auto;
+        margin-right: auto;
+        padding-bottom: 0;
+    }
+
+    .show {
+        margin-top: 0;
+        opacity: 1;
+        transition: all linear 400ms;
+    }
+</style>
+
+<div>
+    <div class="alert alert-error" data-ng-cloak data-ng-show="$root.error" data-ng-animate="'fade'">
+        {{ $root.error }}
+    </div>
+    <div class="well" ng-class="visibility">
+        <form data-ng-submit="connect()">
+            <div class="control-group">
+                <div class="controls">
+                    <input type="text" class="input-large" placeholder="Login" data-ng-model="login">
+                    <input type="text" class="input-large" placeholder="Password" data-ng-model="password">
+                    <input type="text" class="input-large" placeholder="Tracker's channel" data-ng-model="channel">
+                    <div class="input-prepend input-append">
+                        <span class="add-on">http://</span>
+                        <input class="input-large" name="url" data-ng-model="url" type="text"
+                               placeholder="127.0.0.1:9999" data-ng-disabled="connecting">
+                        <button class="btn btn-primary" type="button" data-ng-click="connect()"
+                                data-ng-disabled="connecting">Go!
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
