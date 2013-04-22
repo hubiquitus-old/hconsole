@@ -153,10 +153,19 @@ module.exports = function (grunt) {
         /*concat: {
          dist: {}
          },*/
+        shell: {
+            require: {
+                command: 'node node_modules/requirejs/bin/r.js -o baseUrl=app/components/hubiquitus4js paths.requireLib=lib/require name=hubiquitus include=requireLib out=app/components/hubiquitus4js/hubiquitus-min.js'
+            }
+        },
+        /*
         requirejs: {
             dist: {
                 // Options: https://github.com/jrburke/r.js/blob/master/build/example.build.js
                 options: {
+                    name: 'hubiquitus4js',
+                    out: 'app/components/hubiquitus4js/hubiquitus4js.js',
+                    include: 'lib/require.js',
                     // `name` and `out` is set by grunt-usemin
                     baseUrl: 'app/components/hubiquitus4js',
                     optimize: 'none',
@@ -172,6 +181,7 @@ module.exports = function (grunt) {
                 }
             }
         },
+        */
         concat: {
             dist: {
                 files: {
@@ -304,6 +314,7 @@ module.exports = function (grunt) {
         'clean:server',
         'coffee:dist',
         'compass:server',
+        'shell',
         'livereload-start',
         'connect:livereload',
         'open',
@@ -314,6 +325,7 @@ module.exports = function (grunt) {
         'clean:server',
         'coffee',
         'compass',
+        'shell',
         'connect:test',
         'karma'
     ]);
@@ -325,7 +337,7 @@ module.exports = function (grunt) {
         'coffee',
         'compass:dist',
         'useminPrepare',
-        'requirejs',
+        'shell',
         'imagemin',
         'cssmin',
         'htmlmin',
