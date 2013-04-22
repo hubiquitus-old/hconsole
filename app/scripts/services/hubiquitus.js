@@ -86,7 +86,7 @@ angular.module('hconsoleApp').factory('hubiquitus', function ($rootScope, $windo
 
             hClient.onMessage = function (hMessage) {
                 console.debug('onMessage', hMessage);
-                if (typeof onMessageCallback === 'funtion') {
+                if (typeof onMessageCallback === 'function') {
                     $rootScope.safeApply(function () {
                         onMessageCallback.call(this, hMessage);
                     });

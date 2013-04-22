@@ -10,7 +10,6 @@ angular.module('hconsoleApp').controller('NodeCtrl', function ($rootScope, $loca
 
     hubiquitus.onMessage(function (hMessage) {
         var peerInfo = hMessage.payload;
-        console.log(peerInfo);
 
         var now = new Date().getTime();
 
