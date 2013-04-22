@@ -15,3 +15,7 @@ Hubiquitus's Administration hConsole
 ### Build
 
     $ grunt build
+
+### Demo
+
+http://hconsole.herokuapp.com/
