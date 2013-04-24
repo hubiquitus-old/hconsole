@@ -24,10 +24,11 @@ angular.module('hconsoleApp').controller('NodeCtrl', function ($rootScope, $loca
         process.loadAvg = peerInfo.peerLoadAvg;
 
         if (process.cpuSeries) {
-            process.cpuSeries.addPoint([now, Math.round(peerInfo.peerLoadAvg[0] * 100) / 100]);
+            console.log(process.cpuSeries.data.length);
+            process.cpuSeries.addPoint([now, Math.round(peerInfo.peerLoadAvg[0] * 100) / 100], true, process.cpuSeries.data.length > 500);
         }
         if (process.heapSeries) {
-            process.heapSeries.addPoint([now, Math.round(((100 / peerInfo.peerMemory.heapTotal) * peerInfo.peerMemory.heapUsed) * 100) / 100]);
+            process.heapSeries.addPoint([now, Math.round(((100 / peerInfo.peerMemory.heapTotal) * peerInfo.peerMemory.heapUsed) * 100) / 100], true, process.heapSeries.data.length > 500);
         }
 
         if (typeof process.indexes[peerInfo.peerId] === 'undefined') {

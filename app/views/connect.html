@@ -18,19 +18,28 @@
         opacity: 1;
         transition: all linear 400ms;
     }
+
+    .alert-error {
+        text-align: center;
+    }
+
 </style>
 
 <div>
-    <div class="alert alert-error" data-ng-cloak data-ng-show="$root.error" data-ng-animate="'fade'">
-        {{ $root.error }}
+    <div class="alert alert-error" data-ng-cloak data-ng-show="error" data-ng-animate="'fade'">
+        {{ error }}
     </div>
     <div class="well" ng-class="visibility">
         <form data-ng-submit="connect()">
             <div class="control-group">
                 <div class="controls">
-                    <input type="text" class="input-large" placeholder="Login" data-ng-model="login">
-                    <input type="text" class="input-large" placeholder="Password" data-ng-model="password">
-                    <input type="text" class="input-large" placeholder="Tracker's channel" data-ng-model="channel">
+                    <input type="text" class="input-large" placeholder="Login" data-ng-model="login"
+                           data-ng-disabled="connecting">
+                    <input type="text" class="input-large" placeholder="Password" data-ng-model="password"
+                           data-ng-disabled="connecting">
+                    <input type="text" class="input-large" placeholder="Tracker's channel" data-ng-model="channel"
+                           data-ng-disabled="connecting">
+
                     <div class="input-prepend input-append">
                         <span class="add-on">http://</span>
                         <input class="input-large" name="url" data-ng-model="url" type="text"

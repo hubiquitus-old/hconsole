@@ -16,6 +16,11 @@ var app = angular.module('hconsoleApp', []).config(function ($routeProvider) {
 });
 
 app.factory('highcharts', function ($window) {
+    $window.Highcharts.setOptions({
+        global: {
+            useUTC: false
+        }
+    });
     return $window.Highcharts;
 });
 

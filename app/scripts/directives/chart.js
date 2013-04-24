@@ -30,6 +30,7 @@ angular.module('hconsoleApp').directive('chart', function (highcharts) {
                     },
                     xAxis: {
                         type: 'datetime',
+                        tickPixelInterval: 150,
                         dateTimeLabelFormats: {month: '%e. %b', year: '%b'},
                         lineColor: '#dddddd'
                     },
