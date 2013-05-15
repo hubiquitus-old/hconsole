@@ -6,8 +6,8 @@ angular.module('hconsoleApp').controller('ConnectCtrl', function ($rootScope, $l
 
     $scope.login = 'urn:localhost:console';
     $scope.password = 'urn:localhost:console';
-    $scope.channel = 'urn:hconsole:pubChannel';
-    $scope.url = '127.0.0.1:9999';
+    $scope.channel = 'urn:localhost:pubChannel';
+    $scope.url = '127.0.0.1:8080';
 
     $scope.visibility = 'show';
     $scope.connecting = false;
