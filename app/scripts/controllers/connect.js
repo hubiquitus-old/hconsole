@@ -2,10 +2,11 @@
 
 angular.module('hconsoleApp').controller('ConnectCtrl', function ($rootScope, $location, $scope, hubiquitus) {
     delete $rootScope.url;
+    $scope.error = $rootScope.error;
 
-    $scope.login = 'urn:localhost:toto';
-    $scope.password = 'urn:localhost:toto';
-    $scope.channel = 'urn:hconsole:trackChannel';
+    $scope.login = 'urn:localhost:console';
+    $scope.password = 'urn:localhost:console';
+    $scope.channel = 'urn:hconsole:pubChannel';
     $scope.url = '127.0.0.1:9999';
 
     $scope.visibility = 'show';
@@ -41,4 +42,12 @@ angular.module('hconsoleApp').controller('ConnectCtrl', function ($rootScope, $l
             hubiquitus.connect($scope.login, $scope.password, 'http://' + $scope.url);
         }
     };
+
+    $scope.$on('$destroy', function () {
+        hubiquitus.onConnected(undefined);
+        hubiquitus.onConnecting(undefined);
+        hubiquitus.onError(undefined);
+        hubiquitus.onDisconnected(undefined);
+    });
+
 });

@@ -23,64 +23,64 @@ angular.module('hconsoleApp').factory('hubiquitus', function ($rootScope, $windo
         hClient.onStatus = function (hStatus) {
             console.debug('onStatus', hStatus);
             switch (hStatus.status) {
-                case hClient.statuses.CONNECTED:
-                    connected = true;
-                    if (typeof onConnectedCallback === 'function') {
-                        $rootScope.safeApply(onConnectedCallback);
-                    }
-                    break;
-                case hClient.statuses.CONNECTING:
-                    if (typeof onConnectingCallback === 'function') {
-                        $rootScope.safeApply(onConnectingCallback);
-                    }
-                    break;
-                case hClient.statuses.DISCONNECTED:
-                    connected = false;
-                    if (typeof onDisconnectedCallback === 'function') {
-                        $rootScope.safeApply(onDisconnectedCallback);
-                    }
-                    break;
+            case hClient.statuses.CONNECTED:
+                connected = true;
+                if (typeof onConnectedCallback === 'function') {
+                    $rootScope.safeApply(onConnectedCallback);
+                }
+                break;
+            case hClient.statuses.CONNECTING:
+                if (typeof onConnectingCallback === 'function') {
+                    $rootScope.safeApply(onConnectingCallback);
+                }
+                break;
+            case hClient.statuses.DISCONNECTED:
+                connected = false;
+                if (typeof onDisconnectedCallback === 'function') {
+                    $rootScope.safeApply(onDisconnectedCallback);
+                }
+                break;
             }
 
             if (typeof onErrorCallback === 'function') {
                 switch (hStatus.errorCode) {
-                    case hClient.errors.NO_ERROR:
-                        break;
-                    case hClient.errors.URN_MALFORMAT:
-                        $rootScope.safeApply(function () {
-                            onErrorCallback.call(this, 'URN Malformat');
-                        });
-                        break;
-                    case hClient.errors.CONN_TIMEOUT:
-                        $rootScope.safeApply(function () {
-                            onErrorCallback.call(this, 'Connection timed out');
-                        });
-                        break;
-                    case hClient.errors.AUTH_FAILED:
-                        $rootScope.safeApply(function () {
-                            onErrorCallback.call(this, 'Authentication failed');
-                        });
-                        break;
-                    case hClient.errors.ALREADY_CONNECTED:
-                        $rootScope.safeApply(function () {
-                            onErrorCallback.call(this, 'A connection is already opened');
-                        });
-                        break;
-                    case hClient.errors.TECH_ERROR:
-                        $rootScope.safeApply(function () {
-                            onErrorCallback.call(this, 'Technical Error: ' + hStatus.errorMsg);
-                        });
-                        break;
-                    case hClient.errors.NOT_CONNECTED:
-                        $rootScope.safeApply(function () {
-                            onErrorCallback.call(this, 'Not connected');
-                        });
-                        break;
-                    case hClient.errors.CONN_PROGRESS:
-                        $rootScope.safeApply(function () {
-                            onErrorCallback.call(this, 'A connection is already in progress');
-                        });
-                        break;
+                case hClient.errors.NO_ERROR:
+                    break;
+                case hClient.errors.URN_MALFORMAT:
+                    $rootScope.safeApply(function () {
+                        onErrorCallback.call(this, 'URN Malformat');
+                    });
+                    break;
+                case hClient.errors.CONN_TIMEOUT:
+                    $rootScope.safeApply(function () {
+                        onErrorCallback.call(this, 'Connection timed out');
+                    });
+                    break;
+                case hClient.errors.AUTH_FAILED:
+                    $rootScope.safeApply(function () {
+                        onErrorCallback.call(this, 'Authentication failed');
+                    });
+                    break;
+                case hClient.errors.ALREADY_CONNECTED:
+                    $rootScope.safeApply(function () {
+                        onErrorCallback.call(this, 'A connection is already opened');
+                    });
+                    break;
+                case hClient.errors.TECH_ERROR:
+                    $rootScope.safeApply(function () {
+                        onErrorCallback.call(this, 'Technical Error: ' + hStatus.errorMsg);
+                    });
+                    break;
+                case hClient.errors.NOT_CONNECTED:
+                    $rootScope.safeApply(function () {
+                        onErrorCallback.call(this, 'Not connected');
+                    });
+                    break;
+                case hClient.errors.CONN_PROGRESS:
+                    $rootScope.safeApply(function () {
+                        onErrorCallback.call(this, 'A connection is already in progress');
+                    });
+                    break;
                 }
             }
 
@@ -112,7 +112,7 @@ angular.module('hconsoleApp').factory('hubiquitus', function ($rootScope, $windo
             hClient.subscribe(actor, function (hMessage) {
                 console.debug('subscribe', hMessage);
                 $rootScope.safeApply(function () {
-                    callback(hMessage.payload)
+                    callback(hMessage.payload);
                 });
             });
         },
