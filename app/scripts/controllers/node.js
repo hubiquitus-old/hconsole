@@ -69,12 +69,14 @@ angular.module('hconsoleApp').controller('NodeCtrl', function ($rootScope, $loca
     });
 
     hubiquitus.onError(function (message) {
+        $rootScope.state = 'error';
         $rootScope.error = message;
         $location.path('/');
     });
 
     hubiquitus.onDisconnected(function () {
-        $rootScope.error = 'Disconnected';
+        $rootScope.state = 'disconnected';
+        delete $rootScope.error;
         $location.path('/');
     });
 

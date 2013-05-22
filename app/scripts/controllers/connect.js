@@ -3,6 +3,7 @@
 angular.module('hconsoleApp').controller('ConnectCtrl', function ($rootScope, $location, $scope, hubiquitus) {
     delete $rootScope.url;
     $scope.error = $rootScope.error;
+    $rootScope.state = $rootScope.error ? 'error' : 'disconnected';
 
     $scope.login = 'urn:localhost:console';
     $scope.password = 'urn:localhost:console';
@@ -13,6 +14,7 @@ angular.module('hconsoleApp').controller('ConnectCtrl', function ($rootScope, $l
     $scope.connecting = false;
 
     hubiquitus.onConnected(function () {
+        $rootScope.state = 'connected';
         hubiquitus.subscribe($scope.channel, function (subscription) {
             if (subscription.status === 0) {
                 $rootScope.url = $scope.url;
@@ -24,13 +26,16 @@ angular.module('hconsoleApp').controller('ConnectCtrl', function ($rootScope, $l
         });
     });
     hubiquitus.onConnecting(function () {
+        $rootScope.state = 'connecting';
         $scope.connecting = true;
     });
     hubiquitus.onError(function (message) {
+        $rootScope.state = 'error';
         $scope.connecting = false;
         $scope.error = message;
     });
     hubiquitus.onDisconnected(function () {
+        $rootScope.state = 'disconnected';
         $scope.connecting = false;
         $scope.error = 'Disconnected';
     });
