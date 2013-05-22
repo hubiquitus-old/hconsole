@@ -12,7 +12,11 @@
     <div class="navbar-inner">
         <div class="container">
             <span class="brand">
-                <img src="images/{{ $root.state || 'disconnected' }}.png"/>Hubiquitus Console
+                <img src="images/connected.png" data-ng-cloak data-ng-show="$root.state == 'connected'"/>
+                <img src="images/connecting.png" data-ng-cloak data-ng-show="$root.state == 'connecting'"/>
+                <img src="images/disconnected.png" data-ng-cloak data-ng-show="$root.state == 'disconnected'"/>
+                <img src="images/error.png" data-ng-cloak data-ng-show="$root.state == 'error'"/>
+                Hubiquitus Console
                 <span data-ng-cloack data-ng-show="$root.url">@ {{ $root.url }}</span>
             </span>
 
