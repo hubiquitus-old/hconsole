@@ -6,4 +6,12 @@ angular.module('hconsoleApp').controller('NavbarCtrl', function ($rootScope, $lo
         hubiquitus.disconnect();
         $location.path('/');
     };
+    $scope.nodeView = function ($event) {
+        $event.preventDefault();
+        $location.path('/node/' + hubiquitus.getChannel());
+    };
+    $scope.graphView = function ($event) {
+        $event.preventDefault();
+        $location.path('/graph/' + hubiquitus.getChannel());
+    };
 });
