@@ -6,7 +6,7 @@
     "highcharts": "git://github.com/ewen/bower-highcharts.git#3.0.1",
     "jquery": "git://github.com/components/jquery.git#1.9.1",
     "requirejs": "git://github.com/jrburke/requirejs#2.1.6",
-    "hubiquitus4js": "git@github.com:hubiquitus/hubiquitus4js.git#0.6.4"
+    "hubiquitus4js": "git://github.com/hubiquitus/hubiquitus4js.git#v0.7.0-beta"
   },
   "devDependencies": {
     "angular-mocks": "git://github.com/angular/bower-angular-mocks.git#1.0.7",

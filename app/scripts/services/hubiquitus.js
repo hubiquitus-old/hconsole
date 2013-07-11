@@ -1,6 +1,6 @@
 'use strict';
 
-angular.module('hconsoleApp').factory('hubiquitus', function ($rootScope, $window) {
+angular.module('hconsoleApp').factory('hubiquitus', function ($rootScope, HubiquitusClient) {
 
     $rootScope.safeApply = function (fn) {
         var phase = this.$root.$$phase;
@@ -18,7 +18,7 @@ angular.module('hconsoleApp').factory('hubiquitus', function ($rootScope, $windo
     var onConnectedCallback, onConnectingCallback, onErrorCallback, onDisconnectedCallback, onMessageCallback;
 
     function init() {
-        hClient = $window.hClient;
+        hClient = new HubiquitusClient();
 
         hClient.onStatus = function (hStatus) {
             console.debug('onStatus', hStatus);

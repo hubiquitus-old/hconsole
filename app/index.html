@@ -34,6 +34,12 @@
 <!-- build:js scripts/vendor/hubiquitus4js.js -->
 <script src="components/hubiquitus4js/hubiquitus-min.js"></script>
 <!-- endbuild -->
+<script>
+    // TODO : Better integration between Angular and RequireJS
+    require(['hubiquitus'], function (HubiquitusClient) {
+        window.HubiquitusClient = HubiquitusClient
+    })
+</script>
 <!-- build:js scripts/vendor/jquery.js -->
 <script src="components/jquery/jquery.js"></script>
 <!-- endbuild -->
