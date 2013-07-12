@@ -13,15 +13,32 @@ angular.module('hconsoleApp').factory('hubiquitus', function ($rootScope, Hubiqu
         }
     };
 
-    var hClient;
-    var connected = false;
-    var onConnectedCallback, onConnectingCallback, onErrorCallback, onDisconnectedCallback, onMessageCallback;
+    var hClient,
+        connected = false,
+        currentChannel = undefined,
+        onConnectedCallback, onConnectingCallback, onErrorCallback, onDisconnectedCallback, onMessageCallback;
+
+    // Parsing du hMessage pour les arbres de données et les graphs
+    var HMessage = function (hMessage) {
+        if (hMessage.type === 'peer-info') {
+            var payload = hMessage.payload;
+
+            this.peerId = payload.peerId,
+            this.domain = this.peerId.substr(0, this.peerId.lastIndexOf(':')),
+            this.host = payload.peerIP,
+            this.process = payload.peerPID,
+            this.actor = this.peerId.substr(this.peerId.lastIndexOf(':') + 1),
+            this.ressource = payload.peerRessource,
+            this.type = payload.peerType.toLowerCase();
+            this.status = payload.peerStatus;
+        }
+    };
 
     function init() {
         hClient = new HubiquitusClient();
 
         hClient.onStatus = function (hStatus) {
-            console.debug('onStatus', hStatus);
+            //console.debug('onStatus', hStatus);
             switch (hStatus.status) {
             case hClient.statuses.CONNECTED:
                 connected = true;
@@ -85,15 +102,18 @@ angular.module('hconsoleApp').factory('hubiquitus', function ($rootScope, Hubiqu
             }
 
             hClient.onMessage = function (hMessage) {
-                console.debug('onMessage', hMessage);
+                //console.debug('onMessage', hMessage);
+
                 if (typeof onMessageCallback === 'function') {
                     $rootScope.safeApply(function () {
-                        onMessageCallback.call(this, hMessage);
+                        onMessageCallback.call(this, new HMessage(hMessage), hMessage.type);
                     });
                 }
             };
         };
     }
+
+
 
     return {
         isConnected: function () {
@@ -110,8 +130,11 @@ angular.module('hconsoleApp').factory('hubiquitus', function ($rootScope, Hubiqu
         },
         subscribe: function (actor, callback) {
             hClient.subscribe(actor, function (hMessage) {
-                console.debug('subscribe', hMessage);
+                //console.debug('subscribe', hMessage);
                 $rootScope.safeApply(function () {
+                    if (hMessage.payload.status === 0) {
+                        currentChannel = actor;
+                    }
                     callback(hMessage.payload);
                 });
             });
@@ -133,6 +156,9 @@ angular.module('hconsoleApp').factory('hubiquitus', function ($rootScope, Hubiqu
         },
         onMessage: function (callback) {
             onMessageCallback = callback;
+        },
+        getChannel: function () {
+            return currentChannel;
         }
     };
 
