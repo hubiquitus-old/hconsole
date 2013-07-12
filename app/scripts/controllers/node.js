@@ -27,8 +27,9 @@ angular.module('hconsoleApp').controller('NodeCtrl', function ($rootScope, $loca
         return null;
     }
 
-    hubiquitus.onMessage(function (hMessage) {
+    /*hubiquitus.onMessage(function (hMessage) {
         if (hMessage.type === 'peer-info') {
+        console.log('node');
             var peerInfo = hMessage.payload;
 
             var now = new Date().getTime();
@@ -68,22 +69,10 @@ angular.module('hconsoleApp').controller('NodeCtrl', function ($rootScope, $loca
         }
     });
 
-    hubiquitus.onError(function (message) {
-        $rootScope.state = 'error';
-        $rootScope.error = message;
-        $location.path('/');
-    });
-
-    hubiquitus.onDisconnected(function () {
-        $rootScope.state = 'disconnected';
-        delete $rootScope.error;
-        $location.path('/');
-    });
-
     $scope.$on('$destroy', function () {
         hubiquitus.onMessage(undefined);
         hubiquitus.onError(undefined);
         hubiquitus.onDisconnected(undefined);
     });
-
+    */
 });

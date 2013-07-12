@@ -1,6 +1,6 @@
 'use strict';
 
-angular.module('hconsoleApp').controller('ConnectCtrl', function ($rootScope, $location, $scope, hubiquitus) {
+angular.module('hconsoleApp').controller('ConnectCtrl', function ($rootScope, $location, $scope, hubiquitus, dataTree) {
     delete $rootScope.url;
     $scope.error = $rootScope.error;
     $rootScope.state = $rootScope.error ? 'error' : 'disconnected';
@@ -19,6 +19,8 @@ angular.module('hconsoleApp').controller('ConnectCtrl', function ($rootScope, $l
             if (subscription.status === 0) {
                 $rootScope.url = $scope.url;
                 $location.path('/node/' + $scope.channel);
+
+                dataTree.init();
             } else {
                 $scope.connecting = false;
                 $scope.error = subscription.result;

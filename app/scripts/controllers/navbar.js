@@ -10,8 +10,12 @@ angular.module('hconsoleApp').controller('NavbarCtrl', function ($rootScope, $lo
         $event.preventDefault();
         $location.path('/node/' + hubiquitus.getChannel());
     };
-    $scope.graphView = function ($event) {
+    $scope.physicView = function ($event) {
         $event.preventDefault();
-        $location.path('/graph/' + hubiquitus.getChannel());
+        $location.path('/physic/' + hubiquitus.getChannel());
+    };
+    $scope.logicView = function ($event) {
+        $event.preventDefault();
+        $location.path('/logic/' + hubiquitus.getChannel());
     };
 });
