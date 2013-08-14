@@ -22,6 +22,9 @@
 
             <div class="nav-collapse collapse" data-ng-cloack data-ng-show="$root.url">
                 <p class="navbar-text pull-right">
+                    <a href="#" class="navbar-link" data-ng-click="nodeView($event)">node view</a> |
+                    <a href="#" class="navbar-link" data-ng-click="physicView($event)">physical distribution</a> |
+                    <a href="#" class="navbar-link" data-ng-click="logicView($event)">logical distribution</a> |
                     <a href="#" class="navbar-link" data-ng-click="disconnect($event)">disconnect</a>
                 </p>
             </div>
@@ -49,13 +52,22 @@
 <!-- build:js scripts/vendor/highcharts.js -->
 <script src="components/highcharts/highcharts.src.js"></script>
 <!-- endbuild -->
+
+
+<script src="http://d3js.org/d3.v3.js"></script>
+
 <!-- build:js scripts/scripts.js -->
 <script src="scripts/app.js"></script>
 <script src="scripts/controllers/node.js"></script>
+<script src="scripts/controllers/logicalDistribution.js"></script>
+<script src="scripts/controllers/physicalDistribution.js"></script>
 <script src="scripts/controllers/connect.js"></script>
 <script src="scripts/controllers/navbar.js"></script>
 <script src="scripts/directives/chart.js"></script>
 <script src="scripts/services/hubiquitus.js"></script>
+<script src="scripts/services/circlegraph.js"></script>
+<script src="scripts/services/treegraph.js"></script>
+<script src="scripts/services/datatree.js"></script>
 <!-- endbuild -->
 
 </body>
