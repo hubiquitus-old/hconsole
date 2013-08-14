@@ -19,8 +19,8 @@ angular.module('hconsoleApp').factory('dataTree', function ($rootScope, $routePa
                         i + 1 < this.length ?
                             this.search(testFunc, i + 1) :
                             null
-                    )
-            );
+                        )
+                );
     };
     Array.prototype.searchAll = function (testFunc, i) {
         var ret = [];
@@ -33,23 +33,27 @@ angular.module('hconsoleApp').factory('dataTree', function ($rootScope, $routePa
         return ret;
     };
     Array.prototype.find = function (value, i) {
-        return this.search(function (currentVal) { return currentVal === value }, i);
+        return this.search(function (currentVal) {
+            return currentVal === value
+        }, i);
     };
     Array.prototype.findAll = function (value, i) {
-        return this.searchAll(function (currentVal) { return currentVal === value }, i);
+        return this.searchAll(function (currentVal) {
+            return currentVal === value
+        }, i);
     };
-    Array.prototype.remove =  function (value, i) {
+    Array.prototype.remove = function (value, i) {
         return (i = this.find(value, i)) != null ? this.splice(i, 1) : null;
     };
-    Array.prototype.removeAll =  function (value, i) {
+    Array.prototype.removeAll = function (value, i) {
         var ret = null;
-        while ( (i = this.find(value, i)) != null ) ret = this.splice(i, 1)[0];
+        while ((i = this.find(value, i)) != null) ret = this.splice(i, 1)[0];
         return ret;
     };
     Array.prototype.last = function () {
         return this[this.length];
     };
-    Array.prototype.exe = function (instance, args) {
+    Array.prototype.exe = function (instance, args) {
         this.each(function (value) {
             if (typeof value === 'function') {
                 value.apply(instance, args);
@@ -88,7 +92,7 @@ angular.module('hconsoleApp').factory('dataTree', function ($rootScope, $routePa
     var TreeElmt = function (key, data) {
         var childDico = {};
 
-        this.data = data ? data : {name : key};
+        this.data = data ? data : {name: key};
 
         // Valeurs par Défaut.
         if (!this.data.name) {
@@ -107,7 +111,7 @@ angular.module('hconsoleApp').factory('dataTree', function ($rootScope, $routePa
         };
 
         this.eHandler = new EventSupport(this, {
-            'update' : true
+            'update': true
         });
     };
     // Créer ou retrouver un élément générique enfant
@@ -138,7 +142,7 @@ angular.module('hconsoleApp').factory('dataTree', function ($rootScope, $routePa
     // Créer ou retrouver une feuille enfant
     TreeElmt.prototype.leaf = TreeElmt.prototype.elmt;
     // Couper une branche ou une feuille
-    TreeElmt.prototype.cut = function ( /* Leaf path in data tree */ ) {
+    TreeElmt.prototype.cut = function (/* Leaf path in data tree */) {
         var args = Array.prototype.slice.call(arguments),
             childKey = args.shift(),
             childDico = this.getDico(),
@@ -162,9 +166,24 @@ angular.module('hconsoleApp').factory('dataTree', function ($rootScope, $routePa
         return (this.data.children && this.data.children.length > 0);
     };
 
+    // Parsing du hMessage pour les arbres de données et les graphs
+    var HMessage = function (hMessage) {
+        if (hMessage.type === 'peer-info') {
+            var payload = hMessage.payload;
+
+            this.peerId = payload.peerId;
+            this.domain = this.peerId.substr(0, this.peerId.lastIndexOf(':'));
+            this.host = payload.peerIP;
+            this.process = payload.peerPID;
+            this.actor = this.peerId.substr(this.peerId.lastIndexOf(':') + 1);
+            this.ressource = payload.peerRessource;
+            this.type = payload.peerType.toLowerCase();
+            this.status = payload.peerStatus;
+        }
+    };
 
     return {
-        init : function () {
+        init: function () {
             var dataTree = this;
             // Root de l'arbre logique
             dataTree.logical = new TreeElmt("Ubiquitus");
@@ -174,16 +193,18 @@ angular.module('hconsoleApp').factory('dataTree', function ($rootScope, $routePa
 
             hubiquitus.onMessage((function () {
                 var actorTypeRef = {
-                    "session" : 'session',
-                    "channel" : 'channel',
-                    "gateway" : 'gateway',
-                    "auth" : 'auth',
-                    getClassName : function (type) {
+                    "session": 'session',
+                    "channel": 'channel',
+                    "gateway": 'gateway',
+                    "auth": 'auth',
+                    getClassName: function (type) {
                         return actorTypeRef[type] ? actorTypeRef[type] : 'generic';
                     }
                 };
 
-                return function (hMsg, type) {
+                return function (hMessage) {
+                    var hMsg = new HMessage(hMessage);
+                    var type = hMessage.type;
 
                     if (type === 'peer-info') {
                         var className = actorTypeRef.getClassName(hMsg.type);
@@ -192,16 +213,16 @@ angular.module('hconsoleApp').factory('dataTree', function ($rootScope, $routePa
                             dataTree.logical
                                 .branch(hMsg.domain)
                                 //.branch(type, { "className" : className })
-                                .branch(hMsg.actor, { "className" : className })
-                                .leaf(hMsg.ressource, { "name" : hMsg.actor, "className" : className, "title" : hMsg.domain + ':' + hMsg.actor + ':' + hMsg.ressource});
-                            
+                                .branch(hMsg.actor, { "className": className })
+                                .leaf(hMsg.ressource, { "name": hMsg.actor, "className": className, "title": hMsg.domain + ':' + hMsg.actor + ':' + hMsg.ressource});
+
                             dataTree.physical
                                 .branch(hMsg.domain)
                                 .branch(hMsg.host)
                                 .branch(hMsg.process)
                                 .leaf(hMsg.actor)
                                 .leaf(hMsg.ressource);
-                            
+
                         }
                         else if (hMsg.status === 'stopped') {
                             dataTree.logical.cut(hMsg.domain, hMsg.actor, hMsg.ressource);
@@ -226,7 +247,7 @@ angular.module('hconsoleApp').factory('dataTree', function ($rootScope, $routePa
                 $location.path('/');
             });
         },
-        testConnect :  function () {
+        testConnect: function () {
             if (!$routeParams.sessionid || !hubiquitus.isConnected()) {
                 $location.path('/');
             }

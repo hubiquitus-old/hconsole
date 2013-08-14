@@ -18,22 +18,6 @@ angular.module('hconsoleApp').factory('hubiquitus', function ($rootScope, Hubiqu
         currentChannel = undefined,
         onConnectedCallback, onConnectingCallback, onErrorCallback, onDisconnectedCallback, onMessageCallback;
 
-    // Parsing du hMessage pour les arbres de données et les graphs
-    var HMessage = function (hMessage) {
-        if (hMessage.type === 'peer-info') {
-            var payload = hMessage.payload;
-
-            this.peerId = payload.peerId,
-            this.domain = this.peerId.substr(0, this.peerId.lastIndexOf(':')),
-            this.host = payload.peerIP,
-            this.process = payload.peerPID,
-            this.actor = this.peerId.substr(this.peerId.lastIndexOf(':') + 1),
-            this.ressource = payload.peerRessource,
-            this.type = payload.peerType.toLowerCase();
-            this.status = payload.peerStatus;
-        }
-    };
-
     function init() {
         hClient = new HubiquitusClient();
 
@@ -106,7 +90,7 @@ angular.module('hconsoleApp').factory('hubiquitus', function ($rootScope, Hubiqu
 
                 if (typeof onMessageCallback === 'function') {
                     $rootScope.safeApply(function () {
-                        onMessageCallback.call(this, new HMessage(hMessage), hMessage.type);
+                        onMessageCallback.call(this, hMessage);
                     });
                 }
             };
